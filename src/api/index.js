@@ -35,7 +35,7 @@ export const getDomainUrl = function(prefix = '') { //掐指一算五个环境
   } else if (currentUrl.match(`vtms.hhtdlng.com`)) { //开发环境
     domainUrl = `${prefix}api.hhtdlng.com/tms`;
   } else {
-    domainUrl = `${prefix}ptms.91lng.cn`; //本地开发环境
+    domainUrl = `${prefix}dapi.shengdujk.com`; //本地开发环境
   }
   return domainUrl;
 }
@@ -43,7 +43,7 @@ export const getDomainUrl = function(prefix = '') { //掐指一算五个环境
 domainUrl = getDomainUrl('http://');
 
 let pending = []; //声明一个数组用于存储每个ajax请求的取消函数和ajax标识
-let unCancelAjax = ['getTripRecords', 'getOfflineAndStopRecords', 'signOut', 'getTransPowerInfoList']; //设定可以重复请求的ajax请求的apiname(str)。
+let unCancelAjax = []; //设定可以重复请求的ajax请求的apiname(str)。
 let cancelToken = axios.CancelToken;
 let cancelLimitTime = 500; //设置需要cancel的间隔时限
 
@@ -67,6 +67,7 @@ let removePending = (config, isCancel) => {
 
 //添加请求拦截器
 axios.interceptors.request.use(config => {
+  
   removePending(config, true); //在一个ajax发送前执行一下取消操作
   let isNeedCancel = true;
   if (unCancelAjax.length) {
@@ -272,7 +273,6 @@ export const httpServer = (apiName, postData, defaultSuccessCallback, defaultErr
   if (!apiName) return false;
 
   let httpConfig = dealConfig(apiName, postData);
-
   let promise = new Promise(function(resolve, reject) {
     axios(httpConfig).then(
       (res) => {

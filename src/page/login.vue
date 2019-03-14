@@ -20,7 +20,7 @@
           <el-input placeholder="请输入密码" type="password" v-model="ruleForm.password">
           </el-input>
         </el-form-item>
-        <el-form-item label="短信验证码" prop="sms_verify_code">
+        <!-- <el-form-item label="短信验证码" prop="sms_verify_code">
           <el-row>
             <el-col :span="14">
               <el-input placeholder="请输入验证码" type="text" v-model.trim="ruleForm.sms_verify_code" class="vaInput"></el-input>
@@ -29,7 +29,7 @@
               <el-button class="get-code-btn" style="" v-on:click="getMsgCode" type="primary" :loading="msgBtn.isLoading" :disabled="msgBtn.isDisabled">{{msgBtn.getCodeText}}</el-button>
             </el-col>
           </el-row>
-        </el-form-item>
+        </el-form-item> -->
         <!--  <el-form-item label="验证码：" prop="verify_code" validate-on-rule-change>
           <el-row>
             <el-col :span="15">
@@ -87,7 +87,7 @@ export default {
       ruleForm: {
         username: '',
         password: '',
-        sms_verify_code: '',
+        // sms_verify_code: '',
         // verify_code: ''
       },
       isLogin: false,
@@ -102,10 +102,10 @@ export default {
           { required: true, message: '请输入密码', trigger: 'blur' },
           // { validator: validatePass, trigger: 'blur' }
         ],
-        sms_verify_code: [
-          { required: true, message: '请输入验证码', trigger: 'blur' },
-          { min: 4, max: 4, message: '输入4位验证码', trigger: 'blur' }
-        ]
+        // sms_verify_code: [
+        //   { required: true, message: '请输入验证码', trigger: 'blur' },
+        //   { min: 4, max: 4, message: '输入4位验证码', trigger: 'blur' }
+        // ]
       },
       msgBtn: {
         getCodeText: '获取验证码',
@@ -197,14 +197,15 @@ export default {
               this.submitBtn.isBtnLoading = false;
               if (results.data && results.data.code === 0) {
                 resolve(results);
-                this.pbFunc.setLocalData('token', results.data.data.ticket, true);
-                this.getUser();
+                this.pbFunc.setLocalData('token', results.data.content.token, true);
+                this.pbFunc.setLocalData('users', results.data.content.info, true);
+                this.$router.push({ path: '/orderManage/physicalOrder/physicalOrderList' });
+                // this.getUser();
               } else {
-                if (results.data && results.data.code === 600) {
-                  this.isLogin = true;
-                  this.userId = results.data.data.id;
-                }
-                // this.refreshVaImg();
+                // if (results.data && results.data.code === 600) {
+                //   this.isLogin = true;
+                //   this.userId = results.data.data.id;
+                // }
                 reject(results);
               }
             }).catch((err) => {
@@ -255,9 +256,10 @@ export default {
 
     },
     login() {
-      this.loginAjax().then((results) => {
-        this.getMunusList();
-      })
+      this.loginAjax();
+      // .then((results) => {
+      //   this.getMunusList();
+      // })
     },
     toLink(type) {
       if (type === 'register') {

@@ -422,9 +422,9 @@ export default {
     isLogin() {
       if (this.user && this.user.nick_name) {
         //this.$router.push({ path: '/dashboard/dispatchDashboard' });
-        this.$emit('login');
+        // this.$emit('login');
       } else {
-        this.$router.push({ path: '/login' });
+        this.$router.push({ path: '/orderManage/physicalOrder/physicalOrderList' });
       }
     },
     getData() {

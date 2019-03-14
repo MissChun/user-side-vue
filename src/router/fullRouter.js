@@ -1,4 +1,7 @@
-import orderManage from './orderManage'
+import orderManage from './orderManage'//订单管理
+import partnerManage from './partnerManage'//合作方管理
+import servicePackageManage from './servicePackageManage'//服务包管理
+
 export default [{
   path: '',
   name: 'index',
@@ -9,5 +12,8 @@ export default [{
   },
   children: [
     orderManage,
+    partnerManage,
+    servicePackageManage,
+    
   ]
 }];
