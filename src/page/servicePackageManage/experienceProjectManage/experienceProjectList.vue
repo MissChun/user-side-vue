@@ -213,14 +213,14 @@
   </div>
 </template>
 <script>
-import categoryDialog from "@/components/servicePackageManage/categoryDialog";
-import projectDialog from "@/components/servicePackageManage/projectDialog";
+import categoryDialog from '@/components/servicePackageManage/categoryDialog'
+import projectDialog from '@/components/servicePackageManage/projectDialog'
 export default {
-  name: "experienceProjectList",
+  name: 'experienceProjectList',
   computed: {
     enterpriseId() {
-      let users = this.pbFunc.getLocalData("users", true);
-      return users.enterprise._id;
+      let users = this.pbFunc.getLocalData('users', true)
+      return users.enterprise._id
     }
   },
   components: {
@@ -231,52 +231,52 @@ export default {
     return {
       pageLoading: false,
       projectLoading: false,
-      projectActive: "project",
-      active: "0",
-      powerActive: "1",
+      projectActive: 'project',
+      active: '0',
+      powerActive: '1',
       projectTableData: [],
       categoryDialog: {
         isShow: false,
-        type: "add"
-      }, //类别弹窗
+        type: 'add'
+      }, // 类别弹窗
       projectDialog: {
         isShow: false,
-        type: "add"
-      }, //小项弹窗
-      categoryRow: {}, //修改的类别信息
-      projectRow: {}, //修改的小项信息
+        type: 'add'
+      }, // 小项弹窗
+      categoryRow: {}, // 修改的类别信息
+      projectRow: {}, // 修改的小项信息
       pageData: {
         currentPage: 1,
-        totalPage: "",
+        totalPage: '',
         pageSize: 10
       },
       searchFilters: {
-        employmentType: "",
-        isBind: "",
-        keyword: "",
-        field: "name"
+        employmentType: '',
+        isBind: '',
+        keyword: '',
+        field: 'name'
       },
       selectData: {
         fieldSelect: [
-          { id: "name", value: "职位" },
-          { id: "mobile_phone", value: "部门" }
+          { id: 'name', value: '职位' },
+          { id: 'mobile_phone', value: '部门' }
         ]
       },
       thTableList: [
         {
-          title: "小项名称",
-          param: "project_name",
-          width: ""
+          title: '小项名称',
+          param: 'project_name',
+          width: ''
         },
         {
-          title: "所属医院及结算价",
-          param: "menu",
-          width: ""
+          title: '所属医院及结算价',
+          param: 'project_price',
+          width: ''
         }
       ],
       categoryList: [],
-      belongTo: "" //当前类别ID
-    };
+      belongTo: '' // 当前类别ID
+    }
   },
   methods: {
     goPage(row) {
@@ -284,150 +284,145 @@ export default {
         `/#/servicePackageManage/experienceProjectManage/settlementPriceEdit/${
           row._id
         }/`,
-        "_blank"
-      );
+        '_blank'
+      )
     },
     closeDialog: function(type, isSave) {
-      if (type === "category") {
-        this.categoryDialog.isShow = false;
+      if (type === 'category') {
+        this.categoryDialog.isShow = false
         if (isSave) {
-          this.getCategoryList(); //类别列表
+          this.getCategoryList() // 类别列表
         }
-      } else if (type === "project") {
-        this.projectDialog.isShow = false;
+      } else if (type === 'project') {
+        this.projectDialog.isShow = false
         if (isSave) {
-          this.getCategoryList(); //小项列表
+          this.getCategoryList() // 小项列表
         }
       }
     },
     // 获取小项列表
     getProjectList(row, key) {
       if (row) {
-        this.belongTo = row._id;
+        this.belongTo = row._id
         // this.categoryRow = row;
-        console.log(row);
-        this.projectTableData = row.sub_projects;
+        console.log(row)
+        this.projectTableData = row.sub_projects
       }
     },
     // 获取类别列表
     getCategoryList() {
       let postData = {
         enterprise: this.enterpriseId
-      };
-      this.$$http("getProjectList", postData)
+      }
+      this.$$http('getProjectList', postData)
         .then(results => {
-          if (results.data && results.data.code == 0) {
-            this.categoryList = results.data.content;
+          if (results.data && results.data.code === 0) {
+            this.categoryList = results.data.content
             if (this.categoryList.length) {
-              if(this.belongTo){
-                this.categoryList.forEach((item,index)=>{
-                  if(item._id ===this.belongTo){
-                    this.getProjectList(item);
+              if (this.belongTo) {
+                this.categoryList.forEach((item, index) => {
+                  if (item._id === this.belongTo) {
+                    this.getProjectList(item)
                   }
                 })
-              }else{
-                this.getProjectList(this.categoryList[0]);
+              } else {
+                this.getProjectList(this.categoryList[0])
               }
             }
           }
         })
+        // eslint-disable-next-line
         .catch(err => {
-          this.$message.error("获取列表失败！");
-        });
+          this.$message.error('获取列表失败！')
+        })
     },
     pageChange() {},
     updateProject() {},
     // 编辑类别 小项
     editProject(category, type, row) {
-      if (category === "category") {
+      if (category === 'category') {
         this.categoryDialog = {
           isShow: true,
           type: type
-        };
-        if (row) this.categoryRow = row;
-      } else if (category === "project") {
+        }
+        if (row) this.categoryRow = row
+      } else if (category === 'project') {
         this.projectDialog = {
           isShow: true,
           type: type
-        };
-        if (row) this.projectRow = row;
+        }
+        if (row) this.projectRow = row
       }
     },
     // 类别是否关联套餐
     isRelationProject() {
-      return new Promise((resolve, reject) => {});
+      return new Promise((resolve, reject) => {})
     },
     // 删除类别、小项
     deleteProject(type, row) {
-      let apiName = "deleteProject",
-        postData = {
-          id: row._id
-        },
-        title = type === "category" ? "分类" : "小项",
-        deleteMsg =
-          "请确认需要删除该" +
-          title +
-          "删除后不可找回，该操作不影响已新建的订单！";
+      let apiName = 'deleteProject'
+      let postData = {
+        id: row._id
+      }
+      let title = type === 'category' ? '分类' : '小项'
+      let deleteMsg =
+        '请确认需要删除该' +
+        title +
+        '删除后不可找回，该操作不影响已新建的订单！'
       this.$msgbox({
-        title: "删除" + title,
+        title: '删除' + title,
         message: deleteMsg,
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
         showCancelButton: true,
-        type: "warning",
+        type: 'warning',
         beforeClose: (action, instance, done) => {
-          if (action === "confirm") {
-            instance.confirmButtonLoading = true;
-            instance.confirmButtonText = "提交中...";
-            deleteMsg =
-              "无法删除，当前" +
-              title +
-              "有已下套餐正在使用，请配置后重新操作删除！";
-            this.$$http(apiName, postData)
-              .then(results => {
-                instance.confirmButtonLoading = false;
-                instance.confirmButtonText = "确定";
-                if (results.data && results.data.code == 0) {
-                  this.$message({
-                    type: "success",
-                    message: "删除成功"
-                  });
-                  this.getCategoryList();
-                  done();
-                } else {
-                  done();
-                  let deleteTip =
-                    "无法删除，当前" +
-                    title +
-                    "有已下套餐正在使用，请配置后重新操作删除！";
-                  let setMeal = "";
-                  results.data.data.forEach((item, index) => {
-                    setMeal += item.enterprise_name + "、";
-                  });
-                  this.$alert(
-                    deleteTip + "<div>" + setMeal + "</div>",
-                    "删除" + title,
-                    {
-                      confirmButtonText: "确定",
-                      dangerouslyUseHTMLString: true
-                    }
-                  );
-                }
-              })
-              .catch(err => {});
+          if (action === 'confirm') {
+            instance.confirmButtonLoading = true
+            instance.confirmButtonText = '提交中...'
+            this.$$http(apiName, postData).then(results => {
+              instance.confirmButtonLoading = false
+              instance.confirmButtonText = '确定'
+              if (results.data && results.data.code === 0) {
+                this.$message({
+                  type: 'success',
+                  message: '删除成功'
+                })
+                this.getCategoryList()
+                done()
+              } else {
+                done()
+                let deleteTip =
+                  '无法删除，当前' +
+                  title +
+                  '有已下套餐正在使用，请配置后重新操作删除！'
+                let setMeal = ''
+                results.data.data.forEach((item, index) => {
+                  setMeal += item.enterprise_name + '、'
+                })
+                this.$alert(
+                  deleteTip + '<div>' + setMeal + '</div>',
+                  '删除' + title,
+                  {
+                    confirmButtonText: '确定',
+                    dangerouslyUseHTMLString: true
+                  }
+                )
+              }
+            })
           } else {
-            done();
+            done()
             this.$message({
-              type: "info",
-              message: "已取消删除"
-            });
+              type: 'info',
+              message: '已取消删除'
+            })
           }
         }
-      }).then(() => {});
+      }).then(() => {})
     }
   },
   created: function() {
-    this.getCategoryList();
+    this.getCategoryList()
   }
-};
+}
 </script>

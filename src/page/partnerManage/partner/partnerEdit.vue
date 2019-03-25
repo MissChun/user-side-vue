@@ -53,7 +53,7 @@
                       placeholder="请选择"
                     >
                       <el-option
-                        v-for="(item,key) in partnerTypeList"
+                        v-for="(item) in partnerTypeList"
                         :key="item._id"
                         :label="item.type_name"
                         :value="item._id"
@@ -108,23 +108,23 @@
 </template>
 <script>
 export default {
-  name: "ratingEdit",
+  name: 'ratingEdit',
   computed: {
     titleType: function() {
-      return this.$route.query.id ? "编辑合作方" : "新增合作方";
+      return this.$route.query.id ? '编辑合作方' : '新增合作方'
     },
     activeStep: function() {
-      return this.$route.query.activeStep || 0;
+      return this.$route.query.activeStep || 0
     },
     id: function() {
-      return this.$route.query.id || "";
+      return this.$route.query.id || ''
     },
     returnPage: function() {
-      return this.$route.query.id ? "详情页" : "列表页";
+      return this.$route.query.id ? '详情页' : '列表页'
     },
     enterpriseId() {
-      let users = this.pbFunc.getLocalData("users", true);
-      return users.enterprise._id;
+      let users = this.pbFunc.getLocalData('users', true)
+      return users.enterprise._id
     }
   },
   data() {
@@ -133,11 +133,11 @@ export default {
       pageLoading: false,
       pickerOptions0: {
         disabledDate(time) {
-          return time.getTime() > Date.now() - 8.64e6;
+          return time.getTime() > Date.now() - 8.64e6
         }
       },
-      addType: "默认新增",
-      partnerTypeList: "", //合作方类型
+      addType: '默认新增',
+      partnerTypeList: '', // 合作方类型
       editMsgForm: {
         // enterprise_name: "91",
         // enterprise_type: "",
@@ -145,58 +145,58 @@ export default {
         // contact_phone: "17313126861",
         // credit_code: "26353637363736376F",
         // address: "四川省成都市"
-        enterprise_name: "",
-        enterprise_type: "",
-        contact: "",
-        contact_phone: "",
-        credit_code: "",
-        address: ""
+        enterprise_name: '',
+        enterprise_type: '',
+        contact: '',
+        contact_phone: '',
+        credit_code: '',
+        address: ''
       },
       selectData: {
         partnerType: [
-          { id: "license_code", value: "医疗机构" },
-          { id: "organization_code", value: "第三方服务机构" }
+          { id: 'license_code', value: '医疗机构' },
+          { id: 'organization_code', value: '第三方服务机构' }
         ]
       },
       rules: {
         enterprise_name: [
-          { required: true, message: "请输入合作方名称", trigger: "blur" },
-          { min: 1, max: 20, message: "名称由1~20个字符组成", trigger: "blur" }
+          { required: true, message: '请输入合作方名称', trigger: 'blur' },
+          { min: 1, max: 20, message: '名称由1~20个字符组成', trigger: 'blur' }
         ],
         enterprise_type: [
-          { required: true, message: "请选择合作方类型", trigger: "change" }
+          { required: true, message: '请选择合作方类型', trigger: 'change' }
         ],
         contact: [
-          { required: true, message: "请输入合作联系人", trigger: "blur" },
-          { min: 1, max: 5, message: "联系人由1~5个字符组成", trigger: "blur" }
+          { required: true, message: '请输入合作联系人', trigger: 'blur' },
+          { min: 1, max: 5, message: '联系人由1~5个字符组成', trigger: 'blur' }
         ],
         contact_phone: [
-          { required: true, message: "请输入合作联系电话", trigger: "blur" },
+          { required: true, message: '请输入合作联系电话', trigger: 'blur' },
           {
             pattern: this.$store.state.common.regular.contactPhone.match,
             message: this.$store.state.common.regular.contactPhone.tips,
-            trigger: "blur"
+            trigger: 'blur'
           }
         ],
         credit_code: [
           {
             required: true,
-            message: "请输入机构三合一信用码",
-            trigger: "blur"
+            message: '请输入机构三合一信用码',
+            trigger: 'blur'
           },
           {
             pattern: this.$store.state.common.regular.creditCode.match,
             message: this.$store.state.common.regular.creditCode.tips,
-            trigger: "blur"
+            trigger: 'blur'
           }
         ],
         address: [
-          { required: true, message: "请输入合作方地址", trigger: "blur" }
+          { required: true, message: '请输入合作方地址', trigger: 'blur' }
         ]
       },
       saveBasicAndReviewBtn: {
         isLoading: false,
-        btnText: "保存并退出",
+        btnText: '保存并退出',
         isDisabled: false
       },
       // nextStepBtn: {
@@ -206,13 +206,13 @@ export default {
       // },
       detail: {},
       btnNew: {}
-    };
+    }
   },
   created() {
     if (this.id) {
-      this.getDetail();
+      this.getDetail()
     }
-    this.getPartnerTypeList();
+    this.getPartnerTypeList()
   },
   methods: {
     returnToPage: function() {
@@ -221,27 +221,25 @@ export default {
           path: `/basicDataManage/supplierManage/carrierManage/carrierDetail/${
             this.$route.query.id
           }/`
-        });
+        })
       } else {
         this.$router.push({
           path:
-            "/basicDataManage/supplierManage/carrierManage/carrierManagelist"
-        });
+            '/basicDataManage/supplierManage/carrierManage/carrierManagelist'
+        })
       }
     },
     getPartnerTypeList() {
-      this.$$http("partnerTypeList", {})
-        .then(results => {
-          if (results.data && results.data.code == 0) {
-            this.partnerTypeList = results.data.content;
-          }
-        })
-        .catch(err => {});
+      this.$$http('partnerTypeList', {}).then(results => {
+        if (results.data && results.data.code === 0) {
+          this.partnerTypeList = results.data.content
+        }
+      })
     },
     getDetail: function() {
-      this.$$http("associatedPartnersDetail", { id: this.id }).then(results => {
-        if (results.data && results.data.code == 0) {
-          this.detail = results.data.content;
+      this.$$http('associatedPartnersDetail', { id: this.id }).then(results => {
+        if (results.data && results.data.code === 0) {
+          this.detail = results.data.content
           this.editMsgForm = {
             enterprise_name: this.detail.enterprise_name,
             enterprise_type: this.detail.enterprise_type._id,
@@ -249,108 +247,109 @@ export default {
             contact_phone: this.detail.contact_phone,
             credit_code: this.detail.credit_code,
             address: this.detail.position.address
-          };
+          }
         }
-      });
+      })
     },
     editAjax(postData, formName, btnObject, stepNum, isReview) {
       return new Promise((resolve, reject) => {
-        let btnTextCopy = this.pbFunc.deepcopy(btnObject).btnText;
+        let btnTextCopy = this.pbFunc.deepcopy(btnObject).btnText
         this.btnNew = {
           btnText: btnTextCopy,
           isDisabled: false,
           isLoading: false
-        };
-        let apiName = "addPartner";
+        }
+        let apiName = 'addPartner'
         this.$refs[formName].validate(valid => {
           if (valid) {
             /* 如果id存在则为编辑 */
             if (this.id) {
-              postData.id = this.id;
-              apiName = "updatePartner";
+              postData.id = this.id
+              apiName = 'updatePartner'
             }
 
             btnObject = {
-              btnText: "正在提交",
+              btnText: '正在提交',
               isDisabled: true,
               isLoading: true
-            };
+            }
             this.$$http(apiName, postData)
               .then(results => {
                 if (
                   results.data &&
-                  results.data.code == 0 &&
+                  results.data.code === 0 &&
                   results.data.content
                 ) {
                   if (this.id) {
                     this.$router.push({
                       path: `/partnerManage/partner/partnerDetail/${this.id}/`
-                    });
+                    })
                   }
-                  resolve(results.data.content);
+                  resolve(results.data.content)
                 } else {
-                  reject(results.data.content);
+                  reject(results.data.content)
                 }
               })
               .catch(err => {
-                btnObject = this.btnNew;
-                reject(err);
-              });
+                btnObject = this.btnNew
+                reject(err)
+              })
           }
-        });
-      });
+        })
+      })
     },
     associatedPartners(btn, id) {
       let postData = {
         partner: id,
         enterpriseId: this.enterpriseId
-      };
-      this.$$http("associatedPartners", postData)
+      }
+      this.$$http('associatedPartners', postData)
         .then(results => {
-          this.btnObject = btn;
-          console.log(results);
-          if (results.data && results.data.code == 0) {
+          this.btnObject = btn
+          console.log(results)
+          if (results.data && results.data.code === 0) {
             this.$message({
-              message: "提交成功",
-              type: "success"
-            });
+              message: '提交成功',
+              type: 'success'
+            })
             this.$router.push({
-              path: "/partnerManage/partner/partnerList"
-            });
+              path: '/partnerManage/partner/partnerList'
+            })
           }
         })
+        // eslint-disable-next-line
         .catch(err => {
-          btnObject = btn;
-        });
+          this.btnObject = btn
+        })
     },
     editBasics(btn, btnType) {
-      let formName = "addFormSetpOne";
-      let btnObject = btn;
+      let formName = 'addFormSetpOne'
+      let btnObject = btn
 
       let keyArray = [
-        "enterprise_name",
-        "enterprise_type",
-        "contact",
-        "contact_phone",
-        "position",
-        "credit_code"
-      ];
+        'enterprise_name',
+        'enterprise_type',
+        'contact',
+        'contact_phone',
+        'position',
+        'credit_code'
+      ]
       this.editMsgForm.position = {
         address: this.editMsgForm.address
-      };
-      let postData = this.pbFunc.fifterbyArr(this.editMsgForm, keyArray);
+      }
+      let postData = this.pbFunc.fifterbyArr(this.editMsgForm, keyArray)
       if (this.id) {
-        this.editAjax(postData, formName, btnObject, null, true);
+        this.editAjax(postData, formName, btnObject, null, true)
       } else {
-        if (btnType === "out") {
+        if (btnType === 'out') {
           this.editAjax(postData, formName, btnObject, null, true).then(
             results => {
-              this.associatedPartners(this.btnObject, results._id);
+              this.associatedPartners(this.btnObject, results._id)
             }
-          );
+          )
         }
       }
     }
   }
-};
+}
 </script>

@@ -7,15 +7,9 @@
 export default {
   name: 'partnerManage',
   data() {
-    return {
-
-    }
+    return {}
   }
 }
-
 </script>
 <style>
-
-
 </style>
-
