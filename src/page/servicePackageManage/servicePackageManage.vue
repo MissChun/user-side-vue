@@ -7,15 +7,9 @@
 export default {
   name: 'servicePackageManage',
   data() {
-    return {
-
-    }
+    return {}
   }
 }
-
 </script>
 <style>
-
-
 </style>
-

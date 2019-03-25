@@ -37,7 +37,10 @@
                   <el-col :span="8">
                     <div class="label-list">
                       <label>合作方名称:</label>
-                      <div class="detail-form-item" v-html="pbFunc.dealNullData(detailData.enterprise_name)"></div>
+                      <div
+                        class="detail-form-item"
+                        v-html="pbFunc.dealNullData(detailData.enterprise_name)"
+                      ></div>
                     </div>
                   </el-col>
                   <el-col :span="8">
@@ -63,7 +66,10 @@
                   <el-col :span="8">
                     <div class="label-list">
                       <label>合作方联系人:</label>
-                      <div class="detail-form-item" v-html="pbFunc.dealNullData(detailData.contact)"></div>
+                      <div
+                        class="detail-form-item"
+                        v-html="pbFunc.dealNullData(detailData.contact)"
+                      ></div>
                     </div>
                   </el-col>
                   <el-col :span="8">
@@ -95,47 +101,50 @@
 </template>
 <script>
 export default {
-  name: "partnerDetail",
+  name: 'partnerDetail',
   data() {
     return {
       pageLoading: false,
       activeStep: 0,
-      activeName: "detail",
+      activeName: 'detail',
       detailData: {
         carrier: {}
       }
-    };
+    }
   },
   created() {
-    this.getDetail();
+    this.getDetail()
   },
   computed: {
     partnerId: function() {
-      return this.$route.params.id;
+      return this.$route.params.id
     }
   },
   methods: {
-    handleClick() {
-
-    },
+    handleClick() {},
     getDetail: function() {
-      this.pageLoading = true;
-      this.$$http("associatedPartnersDetail", { id: this.partnerId })
+      this.pageLoading = true
+      this.$$http('associatedPartnersDetail', { id: this.partnerId })
         .then(results => {
-          this.pageLoading = false;
-          if (results.data && results.data.code == 0) {
-            this.detailData = results.data.content;
+          this.pageLoading = false
+          if (results.data && results.data.code === 0) {
+            this.detailData = results.data.content
           }
         })
+        // eslint-disable-next-line
         .catch(err => {
-          this.pageLoading = false;
-        });
+          this.pageLoading = false
+        })
     },
     goEditDetail: function(number) {
       this.$router.push({
-        path: `/partnerManage/partner/partnerEdit/?id=`+this.partnerId+`&activeStep=` + number
-      });
+        path:
+          `/partnerManage/partner/partnerEdit/?id=` +
+          this.partnerId +
+          `&activeStep=` +
+          number
+      })
     }
   }
-};
+}
 </script>

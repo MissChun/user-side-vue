@@ -7,15 +7,9 @@
 export default {
   name: 'experienceProjectManage',
   data() {
-    return {
-
-    }
+    return {}
   }
 }
-
 </script>
 <style>
-
-
 </style>
-

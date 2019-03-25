@@ -13,8 +13,8 @@
               >
                 <el-select v-model="searchFilters.field" slot="prepend" placeholder="请选择">
                   <el-option
-                    v-for="(item,key) in selectData.fieldSelect"
-                    :key="key"
+                    v-for="(item) in selectData.fieldSelect"
+                    :key="item.id"
                     :label="item.value"
                     :value="item.id"
                   ></el-option>
@@ -28,8 +28,8 @@
               <el-form-item label="合作方类型:" label-width="100px">
                 <el-select v-model="searchFilters.enterprise_type" placeholder="请选择">
                   <el-option
-                    v-for="(item,key) in selectData.partnerTypeSelect"
-                    :key="item.id"
+                    v-for="(item) in selectData.partnerTypeSelect"
+                    :key="item._id"
                     :label="item.value"
                     :value="item.id"
                   ></el-option>
@@ -85,11 +85,11 @@
 </template>
 <script>
 export default {
-  name: "partnerList",
+  name: 'partnerList',
   computed: {
     enterpriseId() {
-      let users = this.pbFunc.getLocalData("users", true);
-      return users.enterprise._id;
+      let users = this.pbFunc.getLocalData('users', true)
+      return users.enterprise._id
     }
   },
   data() {
@@ -97,85 +97,86 @@ export default {
       pageLoading: false,
       pageData: {
         currentPage: 1,
-        totalCount: "",
+        totalCount: '',
         pageSize: 10
       },
-      searchPostData: {}, //搜索参数
+      searchPostData: {}, // 搜索参数
       searchFilters: {
-        enterprise_type: "",
-        keyword: "",
-        field: "enterprise_name"
+        enterprise_type: '',
+        keyword: '',
+        field: 'enterprise_name'
       },
       selectData: {
-        partnerTypeSelect: [{ id: "", value: "全部" }],
+        partnerTypeSelect: [{ id: '', value: '全部' }],
         fieldSelect: [
-          { id: "enterprise_name", value: "合作方名称" },
-          { id: "contact", value: "联系人" }
+          { id: 'enterprise_name', value: '合作方名称' },
+          { id: 'contact', value: '联系人' }
         ]
       },
       thTableList: [
         {
-          title: "合作方名称",
-          param: "enterprise_name",
-          width: ""
+          title: '合作方名称',
+          param: 'enterprise_name',
+          width: ''
         },
         {
-          title: "合作方类型",
-          param: "enterprise_type.type_name",
-          width: ""
+          title: '合作方类型',
+          param: 'enterprise_type.type_name',
+          width: ''
         },
         {
-          title: "联系人",
-          param: "contact",
-          width: ""
+          title: '联系人',
+          param: 'contact',
+          width: ''
         },
         {
-          title: "联系电话",
-          param: "contact_phone",
-          width: ""
+          title: '联系电话',
+          param: 'contact_phone',
+          width: ''
         }
       ],
       tableData: []
-    };
+    }
   },
   methods: {
     pageChange() {
       setTimeout(() => {
-        this.getList();
-      });
+        this.getList()
+      })
     },
     // 搜索
     startSearch() {
-      this.pageData.currentPage = 1;
-      this.searchPostData = this.pbFunc.deepcopy(this.searchFilters);
-      this.getList();
+      this.pageData.currentPage = 1
+      this.searchPostData = this.pbFunc.deepcopy(this.searchFilters)
+      this.getList()
     },
-    newPage(type,row) {
-      if(type ==='add'){
-        window.open(`/#/partnerManage/partner/partnerEdit`, "_blank");
-      }else if(type === 'detail'){
-         window.open(`/#/partnerManage/partner/partnerDetail/${row._id}/`, "_blank");
+    newPage(type, row) {
+      if (type === 'add') {
+        window.open(`/#/partnerManage/partner/partnerEdit`, '_blank')
+      } else if (type === 'detail') {
+        window.open(
+          `/#/partnerManage/partner/partnerDetail/${row._id}/`,
+          '_blank'
+        )
       }
-      
     },
     // 合作方类型筛选列表
     getPartnerTypeList() {
-      this.$$http("partnerTypeList", {})
-        .then(results => {
-          if (results.data && results.data.code == 0) {
-            // this.selectData.partnerTypeSelect = Object.assign(
-            //   this.selectData.partnerTypeSelect,
-            //   results.data.content
-            // );
-            results.data.content.forEach((item, index) => {
-              this.selectData.partnerTypeSelect.push({
-                id: item.type_key,
-                value: item.type_name
-              });
-            });
-          }
-        })
-        .catch(err => {});
+      this.$$http('partnerTypeList', {}).then(results => {
+        if (results.data && results.data.code === 0) {
+          // this.selectData.partnerTypeSelect = Object.assign(
+          //   this.selectData.partnerTypeSelect,
+          //   results.data.content
+          // );
+          results.data.content.forEach((item, index) => {
+            this.selectData.partnerTypeSelect.push({
+              _id: item._id,
+              id: item.type_key,
+              value: item.type_name
+            })
+          })
+        }
+      })
     },
     // 列表
     getList() {
@@ -183,30 +184,35 @@ export default {
         page: this.pageData.currentPage,
         page_size: this.pageData.pageSize,
         enterpriseId: this.enterpriseId
-      };
-      postData[this.searchPostData.field] = this.searchPostData.keyword;
-      if(this.searchPostData.enterprise_type){
-        postData.enterprise_type = this.searchPostData.enterprise_type;
       }
-      this.$$http("associatedPartnersList", postData)
+      postData.search_type = this.searchPostData.field
+      postData.search = this.searchPostData.keyword
+      // postData[this.searchPostData.field] = this.searchPostData.keyword
+      if (this.searchPostData.enterprise_type) {
+        postData.enterprise_type = this.searchPostData.enterprise_type
+      }
+      postData = this.pbFunc.fifterObjIsNull(postData)
+      this.$$http('associatedPartnersList', postData)
         .then(results => {
-          if (results.data && results.data.code == 0) {
-            this.tableData = results.data.content;
+          if (results.data && results.data.code === 0) {
+            this.tableData = results.data.content.instances
+            this.pageData.totalCount = results.data.content.count
           }
         })
+        // eslint-disable-next-line
         .catch(err => {
           this.$message({
-            message: "获取列表失败",
-            type: "error"
-          });
-        });
+            message: '获取列表失败',
+            type: 'error'
+          })
+        })
     }
   },
   created() {
-    this.getPartnerTypeList();
-    this.getList();
+    this.getPartnerTypeList()
+    this.getList()
   }
-};
+}
 </script>
 <style>
 </style>

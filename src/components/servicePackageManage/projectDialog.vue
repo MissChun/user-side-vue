@@ -51,7 +51,7 @@
 </template>
 <script>
 export default {
-  name: "projectDialog",
+  name: 'projectDialog',
   props: {
     projectDialog: {
       type: Object,
@@ -70,122 +70,122 @@ export default {
 
   data: function() {
     return {
-      type: "project", //弹窗类型
+      type: 'project', // 弹窗类型
       projectRules: {
-        project_name: "",
-        project_description:""
+        project_name: '',
+        project_description: ''
       },
       rules: {
         project_name: [
-          { required: true, message: "请输入小项名称", trigger: "blur" },
-          { min: 1, max: 20, message: "小项名称字数为1~20字", trigger: "blur" }
+          { required: true, message: '请输入小项名称', trigger: 'blur' },
+          { min: 1, max: 20, message: '小项名称字数为1~20字', trigger: 'blur' }
           // { pattern: /^[\u4E00-\u9FA5A-Za-z0-9]{2,20}$/gi, message: '企业名称为中文、英文，不能输入数字、标点符号', trigger: 'blur' },
         ],
         project_description: [
-          { required: true, message: "请输入小项说明", trigger: "blur" },
-          { min: 1, max: 20, message: "小项名称字数为1~500字", trigger: "blur" }
+          { required: true, message: '请输入小项说明', trigger: 'blur' },
+          { min: 1, max: 20, message: '小项名称字数为1~500字', trigger: 'blur' }
           // { pattern: /^[\u4E00-\u9FA5A-Za-z0-9]{2,20}$/gi, message: '企业名称为中文、英文，不能输入数字、标点符号', trigger: 'blur' },
         ]
       },
       submitBtn: {
-        btnText: "确 定",
+        btnText: '确 定',
         isDisabled: false,
         isLoading: false
       },
-      title: "新增小项"
-    };
+      title: '新增小项'
+    }
   },
   computed: {
     enterpriseId() {
-      let users = this.pbFunc.getLocalData("users", true);
-      return users.enterprise._id;
+      let users = this.pbFunc.getLocalData('users', true)
+      return users.enterprise._id
     }
   },
   methods: {
     closeBtn: function() {
-      this.$emit("closeDialogBtn", this.type);
+      this.$emit('closeDialogBtn', this.type)
     },
     editproject: function(projectRules) {
       this.$refs[projectRules].validate(valid => {
         if (valid) {
           this.submitBtn = {
-            btnText: "提交中",
+            btnText: '提交中',
             isDisabled: true,
             isLoading: true
-          };
-          let apiName = "";
+          }
+          let apiName = ''
           let postData = {
-            project_level: "second",
-            project_name:this.projectRules.project_name,
+            project_level: 'second',
+            project_name: this.projectRules.project_name,
             project_description: this.projectRules.project_description
-          };
-          if (this.projectDialog.type === "add") {
-            apiName = "addCategory";
-            postData.enterprise = this.enterpriseId;
-            postData.belong_to = this.belongTo;
-          } else if (this.projectDialog.type === "update") {
-            apiName = "updateCategory";
-            postData.id = this.row._id;
+          }
+          if (this.projectDialog.type === 'add') {
+            apiName = 'addCategory'
+            postData.enterprise = this.enterpriseId
+            postData.belong_to = this.belongTo
+          } else if (this.projectDialog.type === 'update') {
+            apiName = 'updateCategory'
+            postData.id = this.row._id
           }
           this.$$http(apiName, postData)
             .then(results => {
               this.submitBtn = {
-                btnText: "确 定",
+                btnText: '确 定',
                 isDisabled: false,
                 isLoading: false
-              };
+              }
               // this.pageLoading = false;
-              if (results.data && results.data.code == 0) {
+              if (results.data && results.data.code === 0) {
                 this.$message({
                   message:
-                    this.projectDialog.type === "add"
-                      ? "新增小项成功！"
-                      : "编辑小项成功！",
-                  type: "success"
-                });
-                this.$emit("closeDialogBtn", this.type, true);
+                    this.projectDialog.type === 'add'
+                      ? '新增小项成功！'
+                      : '编辑小项成功！',
+                  type: 'success'
+                })
+                this.$emit('closeDialogBtn', this.type, true)
               }
             })
             .catch(err => {
               console.log(err)
               this.submitBtn = {
-                btnText: "确 定",
+                btnText: '确 定',
                 isDisabled: false,
                 isLoading: false
-              };
+              }
               this.$message.error(
-                this.projectDialog.type === "add"
-                  ? "新增小项失败"
-                  : "编辑小项失败"
-              );
-            });
+                this.projectDialog.type === 'add'
+                  ? '新增小项失败'
+                  : '编辑小项失败'
+              )
+            })
         } else {
-          this.submitBtn.isDisabled = false;
+          this.submitBtn.isDisabled = false
         }
-      });
+      })
     }
   },
   watch: {
     projectDialog: {
       handler(val, oldVal) {
-        if (val.isShow && val.type === "update") {
-          this.projectRules.project_name = this.row.project_name;
-          this.projectRules.project_description =  this.row.project_description;
-          this.title = "编辑小项";
+        if (val.isShow && val.type === 'update') {
+          this.projectRules.project_name = this.row.project_name
+          this.projectRules.project_description = this.row.project_description
+          this.title = '编辑小项'
         } else {
-          this.title = "新增小项";
-          this.projectRules.project_name = "";
-          this.projectRules.project_description ="";
+          this.title = '新增小项'
+          this.projectRules.project_name = ''
+          this.projectRules.project_description = ''
         }
-        if (this.$refs["projectRules"]) {
-          this.$refs["projectRules"].clearValidate();
+        if (this.$refs['projectRules']) {
+          this.$refs['projectRules'].clearValidate()
         }
       },
       deep: true
     }
   },
   created: function() {}
-};
+}
 </script>
 <style scoped lang="less">
 </style>
