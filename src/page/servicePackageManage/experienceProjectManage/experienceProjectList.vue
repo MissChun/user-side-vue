@@ -270,7 +270,7 @@ export default {
         },
         {
           title: '所属医院及结算价',
-          param: 'menu',
+          param: 'project_price',
           width: ''
         }
       ],

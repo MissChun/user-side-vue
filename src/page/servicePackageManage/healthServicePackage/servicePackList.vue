@@ -40,7 +40,11 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="服务包类型:" label-width="100px">
-                <el-select v-model="searchFilters.package_type" placeholder="请选择">
+                <el-select
+                  v-model="searchFilters.package_type"
+                  placeholder="请选择"
+                  @change="startSearch"
+                >
                   <el-option
                     v-for="(item) in selectData.servicePackTypeSelect"
                     :key="item._id"
@@ -149,7 +153,7 @@ export default {
         servicePackTypeSelect: [{ id: '', value: '全部' }],
         fieldSelect: [
           { id: 'package_name', value: '服务包名称' },
-          { id: 'contact', value: '服务包合作方' }
+          { id: 'service_agencies.enterprise_name', value: '服务包合作方' }
         ]
       },
       thTableList: [
@@ -278,11 +282,12 @@ export default {
         page_size: this.pageData.pageSize,
         enterprise: this.enterpriseId
       }
-      postData[this.searchPostData.field] = this.searchPostData.keyword
+      postData.search_type = this.searchPostData.field
+      postData.search = this.searchPostData.keyword
       if (this.searchPostData.package_type) {
         postData.package_type = this.searchPostData.package_type
       }
-      if (this.activeTime.length) {
+      if (this.activeTime instanceof Array && this.activeTime.length) {
         postData.effect_time_start = this.activeTime[0]
         postData.effect_time_end = this.activeTime[1]
       }

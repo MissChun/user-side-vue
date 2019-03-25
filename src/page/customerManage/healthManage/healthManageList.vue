@@ -25,7 +25,7 @@
           </el-row>
           <el-row :gutter="20">
             <el-col :span="6">
-              <el-form-item label="性别:">
+              <el-form-item label="是否异常:">
                 <el-select v-model="searchFilters.enterprise_type" placeholder="请选择">
                   <el-option
                     v-for="(item) in selectData.genderSelect"
@@ -60,10 +60,12 @@
             align="center"
             :label="item.title"
             :width="item.width"
-          ></el-table-column>
-          <el-table-column label="已签约服务" align="center">
+          >
             <template slot-scope="scope">
-              <div :title="scope.row.packageStr">{{scope.row.packageStr}}</div>
+              <div v-if="item.isShow">{{scope.row[item.param]}}</div>
+              <div v-else>
+                <span class="text-blue cursor-pointer">查看</span>
+              </div>
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" width="150" fixed="right">
@@ -109,7 +111,7 @@ export default {
       searchFilters: {
         enterprise_type: '',
         keyword: '',
-        field: 'enterprise_name'
+        field: 'nick_name'
       },
       selectData: {
         genderSelect: [
@@ -119,30 +121,58 @@ export default {
           { id: '2', value: '未知' }
         ],
         fieldSelect: [
-          { id: 'enterprise_name', value: '姓名' },
-          { id: 'contact', value: '身份证号' },
-          { id: 'contact', value: '电话' }
+          { id: 'nick_name', value: '姓名' },
+          { id: 'mobile_number', value: '电话' }
         ]
       },
       thTableList: [
         {
           title: '姓名',
           param: 'nick_name',
+          isShow: true,
           width: ''
         },
         {
           title: '性别',
-          param: 'enterprise_type.type_name',
+          param: 'genderStr',
+          isShow: true,
           width: ''
         },
         {
           title: '年龄',
           param: 'age',
+          isShow: true,
           width: ''
         },
         {
           title: '电话',
           param: 'mobile_number',
+          isShow: true,
+          width: ''
+        },
+        {
+          title: '体检报告',
+          param: '',
+          width: ''
+        },
+        {
+          title: '随访问卷',
+          param: '',
+          width: ''
+        },
+        {
+          title: '健康评估',
+          param: '',
+          width: ''
+        },
+        {
+          title: '健康干预方案',
+          param: '',
+          width: ''
+        },
+        {
+          title: '是否异常',
+          param: '',
           width: ''
         }
       ],
@@ -186,6 +216,14 @@ export default {
             this.tableData = results.data.content.instances
             this.tableData.forEach(item => {
               item.packageStr = ''
+              item.genderStr = ''
+              if (item.gender === '0') {
+                item.genderStr = '女'
+              } else if (item.gender === '1') {
+                item.genderStr = '男'
+              } else {
+                item.genderStr = '未知'
+              }
               item.package_list.forEach((packages, index) => {
                 item.packageStr +=
                   packages.package_name +

@@ -11,7 +11,12 @@
                 @keyup.native.13="startSearch"
                 class="search-filters-screen"
               >
-                <el-select v-model="searchFilters.field" slot="prepend" placeholder="请选择">
+                <el-select
+                  v-model="searchFilters.field"
+                  filterable
+                  slot="prepend"
+                  placeholder="请选择"
+                >
                   <el-option
                     v-for="(item,key) in selectData.fieldSelect"
                     :key="key"
@@ -26,7 +31,7 @@
           <el-row :gutter="20">
             <el-col :span="6">
               <el-form-item label="订单状态:">
-                <el-select v-model="searchFilters.complete_status" placeholder="请选择">
+                <el-select v-model="searchFilters.status" placeholder="请选择" @change="startSearch">
                   <el-option
                     v-for="(item,key) in selectData.orderStatusSelect"
                     :key="key"
@@ -177,7 +182,7 @@ export default {
       syncTime: [], // 订单同步时间
       searchPostData: {}, // 搜索参数
       searchFilters: {
-        complete_status: '',
+        status: '',
         keyword: '',
         field: 'order_number'
       },
@@ -191,9 +196,9 @@ export default {
 
         fieldSelect: [
           { id: 'order_number', value: '体检订单号' },
-          { id: 'nick_name', value: '体检用户姓名' },
+          { id: 'profile.nick_name', value: '体检用户姓名' },
           { id: 'check_code', value: '验证码' },
-          { id: 'service_agencies', value: '订单分配对象' }
+          { id: 'service_agencies.enterprise_name', value: '订单分配对象' }
         ]
       },
       thTableList: [
@@ -412,17 +417,18 @@ export default {
         page_size: this.pageData.pageSize,
         enterprise: this.enterpriseId,
         client_type: 'B',
-        order_type: 'business-order'
+        order_type: 'business-order',
+        status: this.searchPostData.status
       }
       postData.search_type = this.searchPostData.field
       postData.search = this.searchPostData.keyword
       if (this.syncTime.length) {
-        postData.effect_time_start = this.syncTime[0]
-        postData.effect_time_end = this.syncTime[1]
+        postData.assigned_time_start = this.syncTime[0]
+        postData.assigned_time_end = this.syncTime[1]
       }
       if (this.generationTime.length) {
-        postData.effect_time_start = this.generationTime[0]
-        postData.effect_time_end = this.generationTime[1]
+        postData.created_at_start = this.generationTime[0]
+        postData.created_at_end = this.generationTime[1]
       }
       postData = this.pbFunc.fifterObjIsNull(postData)
       this.$$http('physicalOrderList', postData)

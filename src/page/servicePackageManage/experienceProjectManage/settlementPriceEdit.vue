@@ -343,18 +343,10 @@ export default {
       }
     },
     returnToPage: function() {
-      if (this.$route.query.id) {
-        this.$router.push({
-          path: `/basicDataManage/supplierManage/carrierManage/carrierDetail/${
-            this.$route.query.id
-          }/`
-        })
-      } else {
-        this.$router.push({
-          path:
-            '/basicDataManage/supplierManage/carrierManage/carrierManagelist'
-        })
-      }
+      this.$router.push({
+        path:
+          '/servicePackageManage/experienceProjectManage/experienceProjectList'
+      })
     },
     // 医院列表
     getHospitalList() {
@@ -363,7 +355,7 @@ export default {
       }
       this.$$http('associatedPartnersList', postData).then(results => {
         if (results.data && results.data.code === 0) {
-          this.hospitalList = results.data.content
+          this.hospitalList = results.data.content.instances
         }
       })
     },

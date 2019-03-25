@@ -26,12 +26,17 @@
           <el-row :gutter="20">
             <el-col :span="6">
               <el-form-item label="合作方类型:" label-width="100px">
-                <el-select v-model="searchFilters.enterprise_type" placeholder="请选择">
+                <el-select
+                  v-model="searchFilters.enterprise_type"
+                  placeholder="请选择"
+                  filterable
+                  @change="startSearch"
+                >
                   <el-option
                     v-for="(item) in selectData.partnerTypeSelect"
                     :key="item._id"
                     :label="item.value"
-                    :value="item.id"
+                    :value="item._id"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -110,7 +115,8 @@ export default {
         partnerTypeSelect: [{ id: '', value: '全部' }],
         fieldSelect: [
           { id: 'enterprise_name', value: '合作方名称' },
-          { id: 'contact', value: '联系人' }
+          { id: 'contact', value: '联系人' },
+          { id: 'contact_phone', value: '联系电话' }
         ]
       },
       thTableList: [

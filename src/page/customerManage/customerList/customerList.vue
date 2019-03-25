@@ -26,7 +26,12 @@
           <el-row :gutter="20">
             <el-col :span="6">
               <el-form-item label="性别:">
-                <el-select v-model="searchFilters.enterprise_type" placeholder="请选择">
+                <el-select
+                  v-model="searchFilters.gender"
+                  filterable
+                  @change="startSearch"
+                  placeholder="请选择"
+                >
                   <el-option
                     v-for="(item) in selectData.genderSelect"
                     :key="item._id"
@@ -107,9 +112,9 @@ export default {
       },
       searchPostData: {}, // 搜索参数
       searchFilters: {
-        enterprise_type: '',
+        gender: '',
         keyword: '',
-        field: 'enterprise_name'
+        field: 'nick_name'
       },
       selectData: {
         genderSelect: [
@@ -132,7 +137,7 @@ export default {
         },
         {
           title: '性别',
-          param: 'enterprise_type.type_name',
+          param: 'genderStr',
           width: ''
         },
         {
@@ -179,7 +184,8 @@ export default {
       let postData = {
         page: this.pageData.currentPage,
         page_size: this.pageData.pageSize,
-        enterpriseId: this.enterpriseId
+        enterpriseId: this.enterpriseId,
+        gender: this.searchPostData.gender
       }
       postData.search_type = this.searchPostData.field
       postData.search = this.searchPostData.keyword
@@ -191,6 +197,14 @@ export default {
             this.tableData = results.data.content.instances
             this.tableData.forEach(item => {
               item.packageStr = ''
+              item.genderStr = ''
+              if (item.gender === '0') {
+                item.genderStr = '女'
+              } else if (item.gender === '1') {
+                item.genderStr = '男'
+              } else {
+                item.genderStr = '未知'
+              }
               item.package_list.forEach((packages, index) => {
                 item.packageStr +=
                   packages.package_name +

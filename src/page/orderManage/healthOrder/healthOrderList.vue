@@ -171,7 +171,8 @@ export default {
       generationTime: [], // 订单生成时间
       searchPostData: {}, // 搜索参数
       searchFilters: {
-        operation: '',
+        state: '',
+        status: '',
         keyword: '',
         field: 'order_number'
       },
@@ -187,8 +188,8 @@ export default {
         ],
         fieldSelect: [
           { id: 'order_number', value: '健康管理订单号' },
-          { id: 'nick_name', value: '健康管理用户姓名' },
-          { id: 'service_agencies', value: '订单来源' }
+          { id: 'profile.nick_name', value: '健康管理用户姓名' },
+          { id: 'source', value: '订单来源' }
         ]
       },
       thTableList: [
@@ -490,13 +491,14 @@ export default {
         enterprise: this.enterpriseId,
         client_type: 'B',
         order_type: 'service-order',
-        operation: this.searchPostData.operation
+        status: this.searchPostData.status,
+        state: this.searchPostData.state
       }
       postData.search_type = this.searchPostData.field
       postData.search = this.searchPostData.keyword
       if (this.generationTime.length) {
-        postData.effect_time_start = this.generationTime[0]
-        postData.effect_time_end = this.generationTime[1]
+        postData.created_at_start = this.generationTime[0]
+        postData.created_at_end = this.generationTime[1]
       }
       postData = this.pbFunc.fifterObjIsNull(postData)
       this.$$http('physicalOrderList', postData)
