@@ -111,7 +111,7 @@ export default {
       let allowedRouter = []
       // let menuList = this.pbFunc.getLocalData('menuList', true)
       // let menuDictionaryObject = this.findDictionary(menuList);
-      // let token = this.pbFunc.getLocalData('token', true);
+      // let token = this.pbFunc.getLocalData('token', true)
       // allowedRouter = this.getRoutesList(menuDictionaryObject);
       allowedRouter = userPath
       console.log('菜单', allowedRouter)
@@ -159,11 +159,11 @@ export default {
     logoutDirect: function() {
       localStorage.clear()
       // 清除session
-      // this.pbFunc.setLocalData('token', '');
+      this.pbFunc.setLocalData('token', '')
       // 清除菜单
-      // this.pbFunc.setLocalData('menuList', '');
+      this.pbFunc.setLocalData('menuList', '')
       // 回到登录页
-      // this.$router.replace({ path: '/login' });
+      this.$router.replace({ path: '/login' })
     }
   },
   created: function(newPath) {

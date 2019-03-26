@@ -413,11 +413,13 @@ export default {
   methods: {
     isLogin() {
       if (this.user && this.user.nick_name) {
-        // this.$router.push({ path: '/dashboard/dispatchDashboard' });
-        // this.$emit('login');
-      } else {
         this.$router.push({
           path: '/orderManage/physicalOrder/physicalOrderList'
+        })
+        // this.$emit('login')
+      } else {
+        this.$router.push({
+          path: '/login'
         })
       }
     },

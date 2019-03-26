@@ -34,10 +34,7 @@ export default {
   },
   computed: {
     users: function() {
-      // return this.pbFunc.getLocalData('users', true);
-      return {
-        nick_name: '测试'
-      }
+      return this.pbFunc.getLocalData('users', true)
     }
   },
   created() {
@@ -55,15 +52,14 @@ export default {
   },
 
   methods: {
-    // isLogin() {
-    //   if (this.users && this.users.nick_name) {
-    //     //this.$router.push({ path: '/dashboard/dispatchDashboard' });
-    //     this.loginLink();
-    //   } else {
-    //     this.$router.push({ path: '/login' });
-    //   }
-
-    // },
+    isLogin() {
+      if (this.users && this.users.nick_name) {
+        // this.$router.push({ path: '/dashboard/dispatchDashboard' });
+        this.loginLink()
+      } else {
+        this.$router.push({ path: '/login' })
+      }
+    },
     logout: function() {
       this.$confirm('确定退出?', '提示', {
         confirmButtonText: '确定',

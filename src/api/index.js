@@ -32,12 +32,12 @@ export const getDomainUrl = function (prefix = '') {
     // 预发环境
     domainUrl = `${prefix}ptms.91lng.cn`
   } else if (
-    currentUrl.match(`tms.hhtdlng.com`) &&
-    !currentUrl.match(`devtms.hhtdlng.com`) &&
-    !currentUrl.match(`vtms.hhtdlng.com`)
+    currentUrl.match(`tc.shengdujk.com`) &&
+    !currentUrl.match(`tc.shengdujk.com`) &&
+    !currentUrl.match(`tc.shengdujk.com`)
   ) {
     // 测试环境
-    domainUrl = `${prefix}api.hhtdlng.com/tms`
+    domainUrl = `${prefix}api.shengdujk.com`
   } else if (
     currentUrl.match(`tms.91lng.cn`) &&
     !currentUrl.match(`ptms.91lng.cn`) &&
