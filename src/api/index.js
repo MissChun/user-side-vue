@@ -29,7 +29,7 @@ export const getDomainUrl = function(prefix = '') {
     domainUrl = `${prefix}ptms.91lng.cn`
   } else if (currentUrl.match(`tc.shengdujk.com`)) {
     // 测试环境
-    domainUrl = `${prefix}tapi.shengdujk.com`
+    domainUrl = `${prefix}api.shengdujk.com`
   } else if (
     currentUrl.match(`tms.91lng.cn`) &&
     !currentUrl.match(`ptms.91lng.cn`) &&
