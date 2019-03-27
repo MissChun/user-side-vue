@@ -1,4 +1,4 @@
-<style>
+<style scoped>
 .types-list {
   line-height: 40px;
 }

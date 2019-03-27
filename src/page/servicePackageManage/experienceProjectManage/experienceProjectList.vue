@@ -86,7 +86,7 @@
                     :value="item.id"
                   ></el-option>
                 </el-select>
-                <el-button slot="append" icon="el-icon-search"></el-button>
+                <el-button slot="append" icon="el-icon-search" @click="startSearch"></el-button>
               </el-input>
             </el-col>
           </el-row>

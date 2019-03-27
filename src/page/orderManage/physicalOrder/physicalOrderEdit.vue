@@ -265,7 +265,8 @@ export default {
     getServicePackList() {
       let postData = {
         need_all: true,
-        enterprise: this.enterpriseId
+        enterprise: this.enterpriseId,
+        package_type: 'medical'
       }
       this.$$http('servicePackList', postData)
         .then(results => {

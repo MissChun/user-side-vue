@@ -93,9 +93,9 @@
 }
 
 .log-img {
-  line-height: 55px;
-  vertical-align: middle;
-  margin-top: -2px;
+  // line-height: 55px;
+  // vertical-align: middle;
+  // margin-top: -2px;
 }
 
 .color-4a9bf8 {
@@ -192,8 +192,10 @@
     <el-row type="flex" class="g-head">
       <router-link :to="{path: '/'}">
         <div href title="运输管理系统" class="logo" :class="isCollapse?'min-logo':'max-logo'">
-          <img class="log-img" v-if="isCollapse" src="../../assets/img/91LNG_min.svg">
-          <img class="log-img" v-else src="../../assets/img/91LNG.svg">
+          <div v-if="isCollapse">
+            <img class="log-img" src="../../assets/img/91LNG_min.svg">
+          </div>
+          <img class="log-img" v-else src="../../assets/img/logo.svg">
         </div>
       </router-link>
       <div class="nav">

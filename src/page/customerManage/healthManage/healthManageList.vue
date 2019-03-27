@@ -19,7 +19,7 @@
                     :value="item.id"
                   ></el-option>
                 </el-select>
-                <el-button slot="append" icon="el-icon-search"></el-button>
+                <el-button slot="append" icon="el-icon-search" @click="startSearch"></el-button>
               </el-input>
             </el-col>
           </el-row>
@@ -28,7 +28,7 @@
               <el-form-item label="是否异常:">
                 <el-select v-model="searchFilters.enterprise_type" placeholder="请选择">
                   <el-option
-                    v-for="(item) in selectData.genderSelect"
+                    v-for="(item) in selectData.abnormalSelect"
                     :key="item._id"
                     :label="item.value"
                     :value="item.id"
@@ -44,7 +44,7 @@
         <!-- <el-button type="primary">导出</el-button> -->
         <el-button type="success" @click="newPage('add')">新增</el-button>
       </div>
-      <div class="table-list">
+      <div class="table-list mt-25">
         <el-table
           :data="tableData"
           stripe
@@ -64,7 +64,7 @@
             <template slot-scope="scope">
               <div v-if="item.isShow">{{scope.row[item.param]}}</div>
               <div v-else>
-                <span class="text-blue cursor-pointer">查看</span>
+                <span class="text-blue cursor-pointer" @click="newPage(item.type,scope.row)">查看</span>
               </div>
             </template>
           </el-table-column>
@@ -114,11 +114,10 @@ export default {
         field: 'nick_name'
       },
       selectData: {
-        genderSelect: [
+        abnormalSelect: [
           { id: '', value: '全部' },
-          { id: '0', value: '女' },
-          { id: '1', value: '男' },
-          { id: '2', value: '未知' }
+          { id: '0', value: '是' },
+          { id: '1', value: '否' }
         ],
         fieldSelect: [
           { id: 'nick_name', value: '姓名' },
@@ -153,11 +152,13 @@ export default {
         {
           title: '体检报告',
           param: '',
+          type: 'physical',
           width: ''
         },
         {
           title: '随访问卷',
           param: '',
+          type: 'questionnaire',
           width: ''
         },
         {
@@ -195,6 +196,18 @@ export default {
       if (type === 'add') {
         window.open(
           `/#/customerManage/customerList/customerEdit/${row._id}/`,
+          '_blank'
+        )
+      } else if (type === 'physical') {
+        window.open(
+          `/#/customerManage/healthManage/physical/physicalList/${row._id}/`,
+          '_blank'
+        )
+      } else if (type === 'questionnaire') {
+        window.open(
+          `/#/customerManage/healthManage/questionnaire/questionnaireList/${
+            row._id
+          }/`,
           '_blank'
         )
       }

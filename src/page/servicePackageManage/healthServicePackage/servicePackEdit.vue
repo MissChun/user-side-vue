@@ -328,10 +328,10 @@ export default {
         service_agencies: '',
         effectTime: [],
         settlement_price: 0,
-        service_sex: '2',
-        package_name: '成都',
-        package_description: '啛啛喳喳',
-        package_price: 800,
+        service_sex: '',
+        package_name: '',
+        package_description: '',
+        package_price: '',
         selectProjects: [],
         projects: []
       },
@@ -430,7 +430,8 @@ export default {
     // 合作方
     getPartnersList() {
       this.$$http('associatedPartnersList', {
-        enterpriseId: this.enterpriseId
+        enterpriseId: this.enterpriseId,
+        enterprise_type: this.typeId
       })
         .then(results => {
           if (results.data && results.data.code === 0) {
