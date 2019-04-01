@@ -36,7 +36,7 @@
                     v-for="(item) in selectData.partnerTypeSelect"
                     :key="item._id"
                     :label="item.value"
-                    :value="item._id"
+                    :value="item.id"
                   ></el-option>
                 </el-select>
               </el-form-item>

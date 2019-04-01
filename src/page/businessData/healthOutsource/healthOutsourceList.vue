@@ -24,21 +24,18 @@
             </el-col>
           </el-row>
           <el-row :gutter="20">
-            <el-col :span="6">
-              <el-form-item label="性别:">
-                <el-select
-                  v-model="searchFilters.gender"
-                  filterable
+            <el-col :span="8">
+              <el-form-item label="订单生成时间:" label-width="110px">
+                <el-date-picker
+                  v-model="screenTime"
+                  type="datetimerange"
                   @change="startSearch"
-                  placeholder="请选择"
-                >
-                  <el-option
-                    v-for="(item) in selectData.genderSelect"
-                    :key="item._id"
-                    :label="item.value"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  :default-time="['00:00:00', '23:59:59']"
+                ></el-date-picker>
               </el-form-item>
             </el-col>
           </el-row>
@@ -66,16 +63,6 @@
             :label="item.title"
             :width="item.width"
           ></el-table-column>
-          <el-table-column label="已签约服务" align="center">
-            <template slot-scope="scope">
-              <div :title="scope.row.packageStr">{{scope.row.packageStr}}</div>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" align="center" width="150" fixed="right">
-            <template slot-scope="scope">
-              <el-button type="primary" size="mini" @click="newPage('add',scope.row)">签约服务包</el-button>
-            </template>
-          </el-table-column>
         </el-table>
         <noData v-if="!pageLoading && tableData.length==0"></noData>
       </div>
@@ -95,7 +82,7 @@
 </template>
 <script>
 export default {
-  name: 'partnerList',
+  name: 'healthOutsourceList',
   computed: {
     enterpriseId() {
       let users = this.pbFunc.getLocalData('users', true)
@@ -112,51 +99,52 @@ export default {
       },
       searchPostData: {}, // 搜索参数
       searchFilters: {
-        gender: '',
+        enterprise_type: '',
         keyword: '',
-        field: 'nick_name'
+        field: 'enterprise_name'
       },
       selectData: {
-        genderSelect: [
-          { id: '', value: '全部' },
-          { id: '0', value: '女' },
-          { id: '1', value: '男' },
-          { id: '2', value: '未知' }
-        ],
-        fieldSelect: [
-          { id: 'nick_name', value: '姓名' },
-          { id: 'identity_card', value: '身份证号' },
-          { id: 'mobile_number', value: '电话' }
-        ]
+        fieldSelect: [{ id: 'enterprise_name', value: '合作方名称' }]
       },
       thTableList: [
         {
-          title: '姓名',
-          param: 'nick_name',
+          title: '合作方名称',
+          param: 'enterprise_name',
           width: ''
         },
         {
-          title: '性别',
-          param: 'genderStr',
+          title: '健康管理服务下单数',
+          param: 'total_count',
           width: ''
         },
         {
-          title: '身份证号',
-          param: 'identity_card',
+          title: '待服务订单数',
+          param: 'actual_count',
           width: ''
         },
         {
-          title: '年龄',
-          param: 'age',
+          title: '服务中订单数',
+          param: 'actual_count',
           width: ''
         },
         {
-          title: '电话',
-          param: 'mobile_number',
+          title: '已完成订单数',
+          param: 'actual_count',
+          width: ''
+        },
+        {
+          title: '应付金额',
+          param: 'should_pay',
+          width: ''
+        },
+        {
+          title: '实付金额',
+          param: 'actual_pay',
           width: ''
         }
       ],
-      tableData: []
+      tableData: [],
+      screenTime: [] // 筛选项
     }
   },
   methods: {
@@ -171,49 +159,26 @@ export default {
       this.searchPostData = this.pbFunc.deepcopy(this.searchFilters)
       this.getList()
     },
-    newPage(type, row) {
-      if (type === 'add') {
-        window.open(
-          `/#/customerManage/customerList/customerEdit/${row._id}/`,
-          '_blank'
-        )
-      }
-    },
+    newPage(type, row) {},
     // 列表
     getList() {
       let postData = {
         page: this.pageData.currentPage,
         page_size: this.pageData.pageSize,
         enterpriseId: this.enterpriseId,
-        gender: this.searchPostData.gender
+        order_type: 'business-order'
       }
       postData.search_type = this.searchPostData.field
       postData.search = this.searchPostData.keyword
-
+      if (this.screenTime && this.screenTime.length) {
+        postData.created_at_start = this.screenTime[0]
+        postData.created_at_end = this.screenTime[1]
+      }
       postData = this.pbFunc.fifterObjIsNull(postData)
-      this.$$http('consumersList', postData)
+      this.$$http('businessDataList', postData)
         .then(results => {
           if (results.data && results.data.code === 0) {
             this.tableData = results.data.content.instances
-            this.tableData.forEach(item => {
-              item.packageStr = ''
-              item.genderStr = ''
-              if (item.gender === '0') {
-                item.genderStr = '女'
-              } else if (item.gender === '1') {
-                item.genderStr = '男'
-              } else {
-                item.genderStr = '未知'
-              }
-              item.package_list.forEach((packages, index) => {
-                item.packageStr +=
-                  packages.package_name +
-                  '(' +
-                  packages.package_type +
-                  ')' +
-                  (index < item.package_list.length - 1 ? '，' : '')
-              })
-            })
             this.pageData.totalCount = results.data.content.count
           }
         })

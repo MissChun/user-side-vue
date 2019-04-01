@@ -71,7 +71,7 @@
     }
   }
   .choosed-cloumn {
-    border-left: 3px solid #4a9bf8;
+    border-left: 3px solid #8186d5;
     padding-left: 22px;
   }
   .children-menu {
@@ -100,7 +100,7 @@
     height: 5px;
     width: 5px;
     display: inline-block;
-    background-color: #4a9bf8;
+    background-color: #8186d5;
     transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     -moz-transform: rotate(45deg);

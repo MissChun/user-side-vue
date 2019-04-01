@@ -180,7 +180,7 @@ export default {
   methods: {
     returnToPage: function() {
       this.$router.push({
-        path: '/orderManage/physicalOrder/physicalOrderList'
+        path: '/customerManage/customerList/customerList'
       })
     },
     // 选择服务包

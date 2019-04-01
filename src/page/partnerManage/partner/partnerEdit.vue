@@ -196,7 +196,7 @@ export default {
       },
       saveBasicAndReviewBtn: {
         isLoading: false,
-        btnText: '保存并退出',
+        btnText: '保存',
         isDisabled: false
       },
       // nextStepBtn: {
@@ -218,14 +218,11 @@ export default {
     returnToPage: function() {
       if (this.$route.query.id) {
         this.$router.push({
-          path: `/basicDataManage/supplierManage/carrierManage/carrierDetail/${
-            this.$route.query.id
-          }/`
+          path: `/partnerManage/partner/partnerDetail/${this.$route.query.id}/`
         })
       } else {
         this.$router.push({
-          path:
-            '/basicDataManage/supplierManage/carrierManage/carrierManagelist'
+          path: '/partnerManage/partner/partnerList'
         })
       }
     },

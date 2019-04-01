@@ -59,13 +59,18 @@ export default {
     },
     goPage() {
       console.log('types', this.types)
-      this.closeBtn()
-      window.open(
-        `/#/servicePackageManage/healthServicePackage/servicePackEdit/${
-          this.types.type_key
-        }/${this.types._id}`,
-        '_blank'
-      )
+
+      if (this.types.type_key) {
+        this.closeBtn()
+        window.open(
+          `/#/servicePackageManage/healthServicePackage/servicePackEdit/${
+            this.types.type_key
+          }/${this.types._id}`,
+          '_blank'
+        )
+      } else {
+        this.$message.warning('选择新增类别！')
+      }
     }
   },
   watch: {

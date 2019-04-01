@@ -4,7 +4,7 @@ export default {
   meta: {
     isVerificationL: true,
     title: '客户健康管理',
-    iconName: 'icon-setting'
+    iconName: 'icon-manage'
   },
   component: resolve =>
     require(['../page/customerManage/customerManage'], resolve),

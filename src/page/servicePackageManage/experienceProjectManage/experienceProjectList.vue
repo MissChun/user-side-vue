@@ -97,8 +97,13 @@
       <el-row :gutter="22">
         <el-col :span="5">
           <div class="nav-tab-setting">
-            <el-tabs v-model="projectActive">
-              <el-tab-pane label="类别" name="project">
+            <el-tabs v-model="projectActive" @tab-click="getCategoryList(true)">
+              <el-tab-pane
+                v-for="(item,index) in categoryTab"
+                :key="index"
+                :label="item.name"
+                :name="item.key"
+              >
                 <div class="department-list">
                   <el-menu :default-active="active" class="el-menu-vertical-demo">
                     <el-menu-item
@@ -156,7 +161,16 @@
                     :prop="item.param"
                     align="center"
                     :label="item.title"
-                  ></el-table-column>
+                  >
+                    <template slot-scope="scope">
+                      <div
+                        v-if="item.param==='priceStr'"
+                        :title="scope.row[item.param]"
+                        class="cursor-pointer"
+                      >{{scope.row[item.param]}}</div>
+                      <div v-else>{{scope.row[item.param]}}</div>
+                    </template>
+                  </el-table-column>
                   <el-table-column label="结算价" align="center">
                     <template slot-scope="scope">
                       <span class="text-blue cursor-pointer" v-on:click="goPage(scope.row)">设置结算价</span>
@@ -231,9 +245,8 @@ export default {
     return {
       pageLoading: false,
       projectLoading: false,
-      projectActive: 'project',
+      projectActive: 'medical',
       active: '0',
-      powerActive: '1',
       projectTableData: [],
       categoryDialog: {
         isShow: false,
@@ -250,6 +263,16 @@ export default {
         totalPage: '',
         pageSize: 10
       },
+      categoryTab: [
+        {
+          key: 'medical',
+          name: '体检类'
+        },
+        {
+          key: 'management',
+          name: '健康服务类'
+        }
+      ],
       searchFilters: {
         employmentType: '',
         isBind: '',
@@ -270,7 +293,7 @@ export default {
         },
         {
           title: '所属医院及结算价',
-          param: 'project_price',
+          param: 'priceStr',
           width: ''
         }
       ],
@@ -291,7 +314,7 @@ export default {
       if (type === 'category') {
         this.categoryDialog.isShow = false
         if (isSave) {
-          this.getCategoryList() // 类别列表
+          this.getCategoryList(true) // 类别列表
         }
       } else if (type === 'project') {
         this.projectDialog.isShow = false
@@ -305,31 +328,47 @@ export default {
       if (row) {
         this.belongTo = row._id
         // this.categoryRow = row;
-        console.log(row)
+        // console.log(row)
         this.projectTableData = row.sub_projects
+        this.projectTableData.forEach(item => {
+          item.priceStr = ''
+          item.related_info.forEach(price => {
+            let partnerNameStr = ''
+            price.partners_info.forEach(partner => {
+              partnerNameStr += partner.enterprise_name + '，'
+            })
+            item.priceStr +=
+              '【' + partnerNameStr + price.settlement_price + '】'
+          })
+        })
       }
     },
     // 获取类别列表
-    getCategoryList() {
+    getCategoryList(tab) {
       let postData = {
-        enterprise: this.enterpriseId
+        enterprise: this.enterpriseId,
+        package_type: this.projectActive
       }
+      if (tab) {
+        this.belongTo = ''
+      }
+      this.projectTableData = []
       this.$$http('getProjectList', postData)
         .then(results => {
           if (results.data && results.data.code === 0) {
             this.categoryList = results.data.content
-            if (this.categoryList.length) {
-              if (this.belongTo) {
-                this.categoryList.forEach((item, index) => {
-                  if (item._id === this.belongTo) {
-                    this.getProjectList(item)
-                  }
-                })
-              } else {
-                this.getProjectList(this.categoryList[0])
-              }
+            // if (this.categoryList.length) {
+            if (this.belongTo) {
+              this.categoryList.forEach((item, index) => {
+                if (item._id === this.belongTo) {
+                  this.getProjectList(item)
+                }
+              })
+            } else {
+              this.getProjectList(this.categoryList[0])
             }
           }
+          // }
         })
         // eslint-disable-next-line
         .catch(err => {
@@ -388,7 +427,7 @@ export default {
                   type: 'success',
                   message: '删除成功'
                 })
-                this.getCategoryList()
+                this.getCategoryList(true)
                 done()
               } else {
                 done()
@@ -422,7 +461,7 @@ export default {
     }
   },
   created: function() {
-    this.getCategoryList()
+    this.getCategoryList(true)
   }
 }
 </script>

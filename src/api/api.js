@@ -9,6 +9,12 @@
  */
 
 const api = {
+  businessDataList: {
+    url: '/api/v1/business-data',
+    method: 'get',
+    desc: '订单业务数据列表',
+    param: {}
+  },
   questionnaireList: {
     url: '/api/v1/question',
     method: 'get',

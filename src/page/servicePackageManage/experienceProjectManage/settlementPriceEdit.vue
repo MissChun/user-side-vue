@@ -351,7 +351,8 @@ export default {
     // 医院列表
     getHospitalList() {
       let postData = {
-        enterpriseId: this.enterpriseId
+        enterpriseId: this.enterpriseId,
+        enterprise_type: 'hospital'
       }
       this.$$http('associatedPartnersList', postData).then(results => {
         if (results.data && results.data.code === 0) {
@@ -442,54 +443,77 @@ export default {
         this.editBasics(this.saveBasicBtn, row)
       }
     },
+    // 价格接口
+    savePrice(row) {
+      return new Promise((resolve, reject) => {
+        let keyArray = ['settlement_price', 'partners']
+        let price = row
+        price.settlement_price = parseFloat(price.settlement_price)
+        let postData = this.pbFunc.fifterbyArr(price, keyArray)
+        this.editAjax(
+          postData,
+          'addFormSetpOne',
+          this.saveBasicBtn,
+          null,
+          true,
+          row
+        ).then(results => {
+          if (results && results.code === 0) {
+            resolve(results)
+          } else {
+            reject(results)
+          }
+        })
+      })
+    },
     // 编辑结算价格
     updateSettlementPrice(row) {
+      console.log('row', row)
       this.$refs['addFormSetpOne'].validate(valid => {
         if (valid) {
-          this.$msgbox({
-            title: '编辑结算价',
-            message:
-              '编辑结算价后，【套餐设置】的结算价描述会做相应改变；已下单成功的订单不受影响，新增订单会按照新的价格进行计算。',
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            showCancelButton: true,
-            type: 'warning',
-            beforeClose: (action, instance, done) => {
-              if (action === 'confirm') {
-                instance.confirmButtonLoading = true
-                instance.confirmButtonText = '提交中...'
-                let keyArray = ['settlement_price', 'partners']
-                let price = row
-                price.settlement_price = parseFloat(price.settlement_price)
-                let postData = this.pbFunc.fifterbyArr(price, keyArray)
-                this.editAjax(
-                  postData,
-                  'addFormSetpOne',
-                  this.saveBasicBtn,
-                  null,
-                  true,
-                  row
-                ).then(results => {
+          if (row.id) {
+            this.$msgbox({
+              title: '编辑结算价',
+              message:
+                '编辑结算价后，【套餐设置】的结算价描述会做相应改变；已下单成功的订单不受影响，新增订单会按照新的价格进行计算。',
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              showCancelButton: true,
+              type: 'warning',
+              beforeClose: (action, instance, done) => {
+                if (action === 'confirm') {
+                  instance.confirmButtonLoading = true
+                  instance.confirmButtonText = '提交中...'
+                  this.savePrice(row).then(results => {
+                    instance.confirmButtonLoading = false
+                    instance.confirmButtonText = '确定'
+                    if (results && results.code === 0) {
+                      done()
+                      this.editMsgForm.prices = []
+                      this.getDetail()
+                      this.copyPrice = {}
+                    }
+                  })
+                } else {
                   instance.confirmButtonLoading = false
                   instance.confirmButtonText = '确定'
-                  if (results && results.code === 0) {
-                    done()
-                    this.editMsgForm.prices = []
-                    this.getDetail()
-                    this.copyPrice = {}
-                  }
-                })
-              } else {
-                instance.confirmButtonLoading = false
-                instance.confirmButtonText = '确定'
-                done()
-                this.$message({
-                  type: 'info',
-                  message: '已取消编辑'
-                })
+                  done()
+                  this.$message({
+                    type: 'info',
+                    message: '已取消编辑'
+                  })
+                }
               }
-            }
-          }).then(action => {})
+            }).then(action => {})
+          } else {
+            this.savePrice(row).then(results => {
+              if (results && results.code === 0) {
+                this.editMsgForm.prices = []
+                this.getDetail()
+                this.copyPrice = {}
+              }
+            })
+          }
         }
       })
     },
@@ -500,7 +524,6 @@ export default {
       let price = row
       price.settlement_price = parseFloat(price.settlement_price)
       let postData = this.pbFunc.fifterbyArr(price, keyArray)
-      console.log('postData', postData)
       this.editAjax(postData, formName, btnObject, null, true, row)
     }
     // editBasics(btn, btnType) {

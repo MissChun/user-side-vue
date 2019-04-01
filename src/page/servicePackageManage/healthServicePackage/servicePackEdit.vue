@@ -48,6 +48,17 @@
 .number-item .el-form-item {
   margin-bottom: 0;
 }
+.inp-number {
+  padding-top: 4px;
+  input {
+    width: 180px;
+    height: 26px;
+    padding: 0 10px;
+    border-radius: 5px;
+    outline: none;
+    border: 1px solid #dcdfe6;
+  }
+}
 </style>
 <template>
   <div id="addPerson" class="detail-main">
@@ -84,9 +95,14 @@
                     ></el-input>
                   </el-form-item>
                 </el-col>-->
-                <el-col :span="10">
+                <el-col :span="10" v-if="type!=='management'">
                   <el-form-item label="服务包合作方:" prop="service_agencies">
-                    <el-select v-model="editMsgForm.service_agencies" clearable placeholder="请选择">
+                    <el-select
+                      v-model="editMsgForm.service_agencies"
+                      clearable
+                      placeholder="请选择"
+                      @change="selectService"
+                    >
                       <el-option
                         v-for="(item) in partnersList"
                         :key="item._id"
@@ -111,43 +127,45 @@
               </el-row>
               <el-row :gutter="40" v-if="type==='medical'">
                 <el-col :span="24">
-                  <div class="table-list">
-                    <el-table
-                      :data="categoryList"
-                      stripe
-                      style="width: 100%"
-                      size="mini"
-                      v-loading="categoryLoading"
-                      border
-                      :class="{'tabal-height-500':!categoryList.length}"
-                    >
-                      <el-table-column
-                        v-for="(item,key) in thTableList"
-                        :key="key"
-                        :prop="item.param"
-                        :width="item.width?item.width:''"
-                        :label="item.title"
-                        :align="item.align"
+                  <el-form-item label prop="selectProjects" label-width="0px">
+                    <div class="table-list">
+                      <el-table
+                        :data="editMsgForm.showProjects"
+                        stripe
+                        style="width: 100%"
+                        size="mini"
+                        v-loading="categoryLoading"
+                        border
+                        :class="{'tabal-height-500':!editMsgForm.showProjects.length}"
                       >
-                        <template slot-scope="scope">
-                          <div v-if="item.param === 'sub_projects'">
-                            <el-checkbox-group
-                              v-model="editMsgForm.selectProjects"
-                              @change="calculatedSettlementPrice"
-                            >
-                              <el-checkbox
-                                v-for="(projects) in scope.row.sub_projects"
-                                :key="projects._id"
-                                :label="projects.selectId"
-                              >{{projects.project_name}}</el-checkbox>
-                            </el-checkbox-group>
-                          </div>
-                          <div v-else>{{scope.row[item.param]}}</div>
-                        </template>
-                      </el-table-column>
-                    </el-table>
-                    <no-data v-if="!categoryLoading && !categoryList.length"></no-data>
-                  </div>
+                        <el-table-column
+                          v-for="(item,key) in thTableList"
+                          :key="key"
+                          :prop="item.param"
+                          :width="item.width?item.width:''"
+                          :label="item.title"
+                          :align="item.align"
+                        >
+                          <template slot-scope="scope">
+                            <div v-if="item.param === 'sub_projects'">
+                              <el-checkbox-group
+                                v-model="editMsgForm.selectProjects"
+                                @change="calculatedSettlementPrice"
+                              >
+                                <el-checkbox
+                                  v-for="(projects) in scope.row.sub_projects"
+                                  :key="projects._id"
+                                  :label="projects.selectId"
+                                >{{projects.project_name}}</el-checkbox>
+                              </el-checkbox-group>
+                            </div>
+                            <div v-else>{{scope.row[item.param]}}</div>
+                          </template>
+                        </el-table-column>
+                      </el-table>
+                      <no-data v-if="!categoryLoading && !editMsgForm.showProjects.length"></no-data>
+                    </div>
+                  </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="结算价格:" label-width="80px">
@@ -157,59 +175,58 @@
               </el-row>
               <el-row :gutter="40" v-else-if="type==='management'">
                 <el-col :span="24">
-                  <div class="table-list management-table">
-                    <el-table
-                      :data="categoryList"
-                      stripe
-                      style="width: 100%"
-                      size="mini"
-                      v-loading="categoryLoading"
-                      border
-                      :class="{'tabal-height-500':!categoryList.length}"
-                    >
-                      <el-table-column
-                        v-for="(item,key) in thTableList"
-                        :key="key"
-                        :prop="item.param"
-                        :width="item.width?item.width:''"
-                        :label="item.title"
-                        :align="item.align"
+                  <el-form-item label prop="selectProjects" label-width="0px">
+                    <div class="table-list management-table">
+                      <el-table
+                        :data="editMsgForm.showProjects"
+                        stripe
+                        style="width: 100%"
+                        size="mini"
+                        v-loading="categoryLoading"
+                        border
+                        :class="{'tabal-height-500':!editMsgForm.showProjects.length}"
                       >
-                        <template slot-scope="scope">
-                          <div v-if="item.param === 'sub_projects'">
-                            <ul class="power-op">
-                              <li v-for="(projects) in scope.row.sub_projects" :key="projects._id">
-                                <el-row>
-                                  <el-col :span="4">
-                                    <el-checkbox-group
-                                      v-model="editMsgForm.selectProjects"
-                                      @change="calculatedSettlementPrice"
-                                    >
-                                      <el-checkbox
-                                        :label="projects.selectId"
-                                      >{{projects.project_name}}</el-checkbox>
-                                    </el-checkbox-group>
-                                  </el-col>
-                                  <el-col :span="8" class="number-item">
-                                    <el-form-item label="次数:">
-                                      <el-input
-                                        placeholder="请输入1~999数字"
-                                        type="text"
-                                        v-model="projects.number"
-                                        size="medium"
-                                      ></el-input>
-                                    </el-form-item>
-                                  </el-col>
-                                </el-row>
-                              </li>
-                            </ul>
-                          </div>
-                          <div v-else>{{scope.row[item.param]}}</div>
-                        </template>
-                      </el-table-column>
-                    </el-table>
-                    <no-data v-if="!categoryLoading && !categoryList.length"></no-data>
-                  </div>
+                        <el-table-column
+                          v-for="(item,key) in thTableList"
+                          :key="key"
+                          :prop="item.param"
+                          :width="item.width?item.width:''"
+                          :label="item.title"
+                          :align="item.align"
+                        >
+                          <template slot-scope="scope">
+                            <div v-if="item.param === 'sub_projects'">
+                              <ul class="power-op">
+                                <li v-for="(projects,index) in scope.row.sub_projects" :key="index">
+                                  <el-row>
+                                    <el-col :span="4">
+                                      <el-checkbox-group v-model="editMsgForm.selectProjects">
+                                        <el-checkbox
+                                          :label="projects.selectId"
+                                        >{{projects.project_name}}</el-checkbox>
+                                      </el-checkbox-group>
+                                    </el-col>
+                                    <el-col :span="8" class="number-item">
+                                      <div class="inp-number">
+                                        <span>次数：</span>
+                                        <input
+                                          placeholder="请输入1~999数字"
+                                          type="text"
+                                          v-model="projects.number"
+                                        >
+                                      </div>
+                                    </el-col>
+                                  </el-row>
+                                </li>
+                              </ul>
+                            </div>
+                            <div v-else>{{scope.row[item.param]}}</div>
+                          </template>
+                        </el-table-column>
+                      </el-table>
+                      <no-data v-if="!categoryLoading && !editMsgForm.showProjects.length"></no-data>
+                    </div>
+                  </el-form-item>
                 </el-col>
               </el-row>
               <el-row :gutter="40">
@@ -333,6 +350,7 @@ export default {
         package_description: '',
         package_price: '',
         selectProjects: [],
+        showProjects: [{ number: '' }],
         projects: []
       },
       categoryList: [], // 检查项
@@ -363,6 +381,9 @@ export default {
         ],
         service_agencies: [
           { required: true, message: '请选择服务包合作方', trigger: 'change' }
+        ],
+        selectProjects: [
+          { required: true, message: '请勾选小项', trigger: 'change' }
         ],
         service_sex: [
           { required: true, message: '请选择服务性别', trigger: 'change' }
@@ -411,7 +432,9 @@ export default {
       this.getDetail()
     }
     this.getPartnersList()
-    this.getCategoryList()
+    if (this.type === 'medical' || this.type === 'management') {
+      this.getCategoryList()
+    }
   },
   methods: {
     returnToPage: function() {
@@ -427,11 +450,17 @@ export default {
         })
       }
     },
+    // 选择合作方
+    selectService() {
+      this.editMsgForm.settlement_price = 0
+      this.editMsgForm.selectProjects = []
+    },
     // 合作方
     getPartnersList() {
       this.$$http('associatedPartnersList', {
         enterpriseId: this.enterpriseId,
-        enterprise_type: this.typeId
+        enterprise_type: 'hospital',
+        need_all: true
       })
         .then(results => {
           if (results.data && results.data.code === 0) {
@@ -448,20 +477,25 @@ export default {
     },
     // 计算结算价格
     calculatedSettlementPrice() {
-      let ids = []
-      this.editMsgForm.settlement_price = 0
-      this.categoryList.forEach(item => {
-        item.sub_projects.forEach(project => {
-          this.editMsgForm.selectProjects.forEach(id => {
-            ids = id.split(',')
-            if (ids[1] === project._id) {
-              this.editMsgForm.settlement_price += parseFloat(
-                project.project_price
-              )
-            }
+      if (this.editMsgForm.service_agencies) {
+        let ids = []
+        this.editMsgForm.settlement_price = 0
+        this.editMsgForm.showProjects.forEach(item => {
+          item.sub_projects.forEach(project => {
+            this.editMsgForm.selectProjects.forEach(id => {
+              ids = id.split(',')
+              if (ids[1] === project._id) {
+                this.editMsgForm.settlement_price += parseFloat(
+                  project.project_price
+                )
+              }
+            })
           })
         })
-      })
+      } else {
+        this.editMsgForm.selectProjects = []
+        this.$message.warning('请先选择服务包合作方！')
+      }
     },
     // 详情
     getDetail: function() {
@@ -482,15 +516,12 @@ export default {
             selectProjects: [],
             projects: []
           }
-          this.detail.projects.forEach(item => {
-            item.sub_projects.forEach(project => {
-              this.editMsgForm.push({
-                first: item.project_id,
-                second: project.project_id,
-                count: project.count ? project.count : ''
-              })
-            })
-          })
+          // this.detail.projects.forEach(item => {
+          //   item.sub_projects.forEach(project => {
+          //     let projectStr = item.project_id+','+project.project_id
+          //     this.editMsgForm.selectProjects.push(projectStr)
+          //   })
+          // })
         }
       })
     },
@@ -566,6 +597,7 @@ export default {
         'effect_time_end'
       ]
       if (this.type !== 'outsource') {
+        this.editMsgForm.projects = []
         keyArray.push('projects')
         keyArray.push('service_sex')
         this.editMsgForm.selectProjects.forEach(item => {
@@ -573,10 +605,24 @@ export default {
           this.editMsgForm.projects.push({
             first: ids[0],
             second: ids[1],
-            count: item.number ? item.number : ''
+            count: ''
           })
         })
       }
+      if (this.type === 'management') {
+        this.frequencyReg(this.editMsgForm.selectProjects)
+        this.editMsgForm.service_agencies = this.enterpriseId
+        this.editMsgForm.showProjects.forEach(item => {
+          item.sub_projects.forEach(project => {
+            this.editMsgForm.projects.forEach(list => {
+              if (project._id === list.second) {
+                list.count = parseInt(project.number)
+              }
+            })
+          })
+        })
+      }
+      // console.log('选择项', this.editMsgForm.showProjects)
       this.editMsgForm.effect_time_start = this.editMsgForm.effectTime[0]
       this.editMsgForm.effect_time_end = this.editMsgForm.effectTime[1]
 
@@ -585,7 +631,8 @@ export default {
         ? parseFloat(postData.settlement_price)
         : 0
       postData.package_price = parseFloat(postData.package_price)
-      this.frequencyReg(this.editMsgForm.selectProjects)
+
+      // console.log('小项', this.editMsgForm.projects)
       if (this.id) {
         this.editAjax(postData, formName, btnObject, null, true)
       } else {
@@ -596,7 +643,7 @@ export default {
     },
     // 次数验证
     frequencyReg(list) {
-      this.categoryList.forEach(item => {
+      this.editMsgForm.showProjects.forEach(item => {
         item.sub_projects.forEach(project => {
           list.forEach(id => {
             let ids = id.split(',')
@@ -627,21 +674,22 @@ export default {
     // 获取类别列表
     getCategoryList() {
       let postData = {
-        enterprise: this.enterpriseId
+        enterprise: this.enterpriseId,
+        package_type: this.type
       }
       this.categoryLoading = true
       this.$$http('getProjectList', postData)
         .then(results => {
           this.categoryLoading = false
           if (results.data && results.data.code === 0) {
-            this.categoryList = results.data.content
-            this.categoryList.forEach(item => {
+            this.editMsgForm.showProjects = results.data.content
+            this.editMsgForm.showProjects.forEach(item => {
               item.sub_projects.forEach(project => {
                 project.selectId = item._id + ',' + project._id
                 project.number = ''
               })
             })
-            console.log('检查项', this.categoryList)
+            console.log('检查项', this.editMsgForm.showProjects)
           }
         })
         // eslint-disable-next-line
