@@ -1,3 +1,8 @@
+<style scoped lang="less">
+.nav-tab .el-row {
+  padding: 0 !important;
+}
+</style>
 <template>
   <div>
     <div class="nav-tab">
@@ -5,40 +10,22 @@
         <el-form class="search-filters-form" label-width="80px" :model="searchFilters" status-icon>
           <el-row :gutter="0">
             <el-col :span="12">
-              <el-input
-                placeholder="请输入"
-                v-model="searchFilters.keyword"
-                @keyup.native.13="startSearch"
-                class="search-filters-screen"
-              >
-                <el-select v-model="searchFilters.field" slot="prepend" placeholder="请选择">
-                  <el-option
-                    v-for="(item) in selectData.fieldSelect"
-                    :key="item.id"
-                    :label="item.value"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-                <el-button slot="append" icon="el-icon-search" @click="startSearch"></el-button>
-              </el-input>
+              <el-form-item label="姓名:">
+                <div>{{detail.nick_name}}</div>
+              </el-form-item>
             </el-col>
           </el-row>
-          <el-row :gutter="20">
-            <el-col :span="6">
+          <el-row :gutter="0">
+            <el-col :span="12">
               <el-form-item label="性别:">
-                <el-select
-                  v-model="searchFilters.gender"
-                  filterable
-                  @change="startSearch"
-                  placeholder="请选择"
-                >
-                  <el-option
-                    v-for="(item) in selectData.genderSelect"
-                    :key="item._id"
-                    :label="item.value"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
+                <div>{{detail.genderStr}}</div>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="0">
+            <el-col :span="12">
+              <el-form-item label="年龄:">
+                <div>{{detail.age}}</div>
               </el-form-item>
             </el-col>
           </el-row>
@@ -65,16 +52,15 @@
             align="center"
             :label="item.title"
             :width="item.width"
-          ></el-table-column>
-          <el-table-column label="已签约服务" align="center">
+          >
             <template slot-scope="scope">
-              <div :title="scope.row.packageStr">{{scope.row.packageStr}}</div>
+              <div>{{scope.row[item.param]}}</div>
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" width="150" fixed="right">
-            <template slot-scope="scope">
-              <el-button type="primary" size="mini" @click="newPage('add',scope.row)">签约服务包</el-button>
-            </template>
+            <!-- <template slot-scope="scope">
+              <el-button type="primary" size="mini" @click="newPage('detail',scope.row)">查看</el-button>
+            </template>-->
           </el-table-column>
         </el-table>
         <noData v-if="!pageLoading && tableData.length==0"></noData>
@@ -95,11 +81,14 @@
 </template>
 <script>
 export default {
-  name: 'partnerList',
+  name: 'physicalList',
   computed: {
     enterpriseId() {
       let users = this.pbFunc.getLocalData('users', true)
       return users.enterprise._id
+    },
+    id: function() {
+      return this.$route.params.id || ''
     }
   },
   data() {
@@ -112,51 +101,40 @@ export default {
       },
       searchPostData: {}, // 搜索参数
       searchFilters: {
-        gender: '',
+        enterprise_type: '',
         keyword: '',
         field: 'nick_name'
       },
       selectData: {
-        genderSelect: [
+        abnormalSelect: [
           { id: '', value: '全部' },
-          { id: '0', value: '女' },
-          { id: '1', value: '男' },
-          { id: '2', value: '未知' }
+          { id: '0', value: '是' },
+          { id: '1', value: '否' }
         ],
         fieldSelect: [
           { id: 'nick_name', value: '姓名' },
-          { id: 'identity_card', value: '身份证号' },
           { id: 'mobile_number', value: '电话' }
         ]
       },
       thTableList: [
         {
-          title: '姓名',
-          param: 'nick_name',
+          title: '编号',
+          param: 'type',
           width: ''
         },
         {
-          title: '性别',
-          param: 'genderStr',
+          title: '问卷标题',
+          param: 'name',
           width: ''
         },
         {
-          title: '身份证号',
-          param: 'identity_card',
-          width: ''
-        },
-        {
-          title: '年龄',
-          param: 'age',
-          width: ''
-        },
-        {
-          title: '电话',
-          param: 'mobile_number',
+          title: '填写时间',
+          param: 'question_date',
           width: ''
         }
       ],
-      tableData: []
+      tableData: [],
+      detail: {} // 详情
     }
   },
   methods: {
@@ -171,10 +149,35 @@ export default {
       this.searchPostData = this.pbFunc.deepcopy(this.searchFilters)
       this.getList()
     },
+    // 用户详情
+    getDetail: function() {
+      return new Promise((resolve, reject) => {
+        this.$$http('consumersDetail', { id: this.id })
+          .then(results => {
+            if (results.data && results.data.code === 0) {
+              this.detail = results.data.content
+              if (this.detail.gender === '0') {
+                this.detail.genderStr = '女'
+              } else if (this.detail.gender === '1') {
+                this.detail.genderStr = '男'
+              } else {
+                this.detail.genderStr = '未知'
+              }
+              resolve(results.data)
+            } else {
+              reject(results.data)
+            }
+          })
+          .catch(err => {
+            reject(err)
+            this.$message.error('获取详情失败！')
+          })
+      })
+    },
     newPage(type, row) {
-      if (type === 'add') {
+      if (type === 'detail') {
         window.open(
-          `/#/customerManage/customerList/customerEdit/${row._id}/`,
+          `/#/customerManage/healthManage/physical/physicalDetail/${row._id}/`,
           '_blank'
         )
       }
@@ -183,37 +186,18 @@ export default {
     getList() {
       let postData = {
         page: this.pageData.currentPage,
-        page_size: this.pageData.pageSize,
-        enterpriseId: this.enterpriseId,
-        gender: this.searchPostData.gender
+        page_size: this.pageData.pageSize
+        // card_no: this.detail.identity_card
+        // enterpriseId: this.enterpriseId
       }
-      postData.search_type = this.searchPostData.field
-      postData.search = this.searchPostData.keyword
+      //   postData.search_type = this.searchPostData.field
+      //   postData.search = this.searchPostData.keyword
 
       postData = this.pbFunc.fifterObjIsNull(postData)
-      this.$$http('consumersList', postData)
+      this.$$http('questionnaireList', postData)
         .then(results => {
           if (results.data && results.data.code === 0) {
             this.tableData = results.data.content.instances
-            this.tableData.forEach(item => {
-              item.packageStr = ''
-              item.genderStr = ''
-              if (item.gender === '0') {
-                item.genderStr = '女'
-              } else if (item.gender === '1') {
-                item.genderStr = '男'
-              } else {
-                item.genderStr = '未知'
-              }
-              item.package_list.forEach((packages, index) => {
-                item.packageStr +=
-                  packages.package_name +
-                  '(' +
-                  packages.package_type +
-                  ')' +
-                  (index < item.package_list.length - 1 ? '，' : '')
-              })
-            })
             this.pageData.totalCount = results.data.content.count
           }
         })
@@ -227,9 +211,11 @@ export default {
     }
   },
   created() {
-    this.getList()
+    this.getDetail().then(data => {
+      if (data.code === 0) {
+        this.getList()
+      }
+    })
   }
 }
 </script>
-<style>
-</style>

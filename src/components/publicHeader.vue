@@ -3,8 +3,10 @@
     <el-row>
       <el-col :span="12">
         <router-link :to="{path: '/'}">
-          <div title="运输管理系统" class="logo">
-            <img class="log-img" src="../assets/img/91LNG.svg">
+          <div title="健康管理业务系统" class="logo">
+            <img class="log-img" src="../assets/img/logo.ico">
+            <span class="fs-14">· 健康管理业务系统</span>
+            <!-- <img class="log-img" src="../assets/img/91LNG.svg"> -->
           </div>
         </router-link>
       </el-col>
@@ -97,7 +99,10 @@ export default {
 }
 
 .el-header img {
-  margin-top: 12px;
+  margin-top: 14px;
+  width: 50px;
+  position: relative;
+  top: 3px;
 }
 
 .text-right {

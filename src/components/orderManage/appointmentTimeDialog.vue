@@ -103,7 +103,7 @@ export default {
               }
               if (results.data && results.data.code === 0) {
                 this.$message.success('编辑成功！')
-                this.$emit('closeDialogBtn', true)
+                this.$emit('closeDialogBtn', true, true)
               }
             })
             // eslint-disable-next-line

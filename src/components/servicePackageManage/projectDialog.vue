@@ -36,6 +36,10 @@
             ></el-input>
           </el-form-item>
         </el-form>
+        <div
+          class="text-center fs-12 text-red"
+          v-if="projectDialog.type ==='update'"
+        >注意：编辑小项后，【套餐设置】及【用户界面】的小项描述会做相应改变</div>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="closeBtn">取 消</el-button>

@@ -1,4 +1,4 @@
-<style>
+<style scoped>
 .list {
   line-height: 40px;
 }

@@ -5,35 +5,22 @@
         <el-form class="search-filters-form" label-width="80px" :model="searchFilters" status-icon>
           <el-row :gutter="0">
             <el-col :span="12">
-              <el-input
-                placeholder="请输入"
-                v-model="searchFilters.keyword"
-                @keyup.native.13="startSearch"
-                class="search-filters-screen"
-              >
-                <el-select v-model="searchFilters.field" slot="prepend" placeholder="请选择">
-                  <el-option
-                    v-for="(item) in selectData.fieldSelect"
-                    :key="item.id"
-                    :label="item.value"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-                <el-button slot="append" icon="el-icon-search" @click="startSearch"></el-button>
-              </el-input>
+              <el-form-item label="姓名:">
+                <div>{{detail.nick_name}}</div>
+              </el-form-item>
             </el-col>
           </el-row>
-          <el-row :gutter="20">
-            <el-col :span="6">
-              <el-form-item label="是否异常:">
-                <el-select v-model="searchFilters.enterprise_type" placeholder="请选择">
-                  <el-option
-                    v-for="(item) in selectData.abnormalSelect"
-                    :key="item._id"
-                    :label="item.value"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
+          <el-row :gutter="0">
+            <el-col :span="12">
+              <el-form-item label="性别:">
+                <div>{{detail.genderStr}}</div>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="0">
+            <el-col :span="12">
+              <el-form-item label="年龄:">
+                <div>{{detail.age}}</div>
               </el-form-item>
             </el-col>
           </el-row>
@@ -62,15 +49,12 @@
             :width="item.width"
           >
             <template slot-scope="scope">
-              <div v-if="item.isShow">{{scope.row[item.param]}}</div>
-              <div v-else>
-                <span class="text-blue cursor-pointer" @click="newPage(item.type,scope.row)">查看</span>
-              </div>
+              <div>{{scope.row[item.param]}}</div>
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" width="150" fixed="right">
             <template slot-scope="scope">
-              <el-button type="primary" size="mini" @click="newPage('add',scope.row)">签约服务包</el-button>
+              <el-button type="primary" size="mini" @click="newPage('detail',scope.row)">查看</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -92,11 +76,14 @@
 </template>
 <script>
 export default {
-  name: 'healthManageList',
+  name: 'physicalList',
   computed: {
     enterpriseId() {
       let users = this.pbFunc.getLocalData('users', true)
       return users.enterprise._id
+    },
+    id: function() {
+      return this.$route.params.id || ''
     }
   },
   data() {
@@ -126,58 +113,28 @@ export default {
       },
       thTableList: [
         {
-          title: '姓名',
-          param: 'nick_name',
-          isShow: true,
+          title: '体检报告编号',
+          param: 'record_no',
           width: ''
         },
         {
-          title: '性别',
-          param: 'genderStr',
-          isShow: true,
+          title: '报告来源',
+          param: 'bak_field1',
           width: ''
         },
         {
-          title: '年龄',
-          param: 'age',
-          isShow: true,
+          title: '体检日期',
+          param: 'record_date',
           width: ''
         },
         {
-          title: '电话',
-          param: 'mobile_number',
-          isShow: true,
-          width: ''
-        },
-        {
-          title: '体检报告',
-          param: '',
-          type: 'physical',
-          width: ''
-        },
-        {
-          title: '随访问卷',
-          param: '',
-          type: 'questionnaire',
-          width: ''
-        },
-        {
-          title: '健康评估',
-          param: '',
-          width: ''
-        },
-        {
-          title: '健康干预方案',
-          param: '',
-          width: ''
-        },
-        {
-          title: '是否异常',
-          param: '',
+          title: '报告日期',
+          param: 'zj_date',
           width: ''
         }
       ],
-      tableData: []
+      tableData: [],
+      detail: {} // 详情
     }
   },
   methods: {
@@ -192,22 +149,35 @@ export default {
       this.searchPostData = this.pbFunc.deepcopy(this.searchFilters)
       this.getList()
     },
+    // 用户详情
+    getDetail: function() {
+      return new Promise((resolve, reject) => {
+        this.$$http('consumersDetail', { id: this.id })
+          .then(results => {
+            if (results.data && results.data.code === 0) {
+              this.detail = results.data.content
+              if (this.detail.gender === '0') {
+                this.detail.genderStr = '女'
+              } else if (this.detail.gender === '1') {
+                this.detail.genderStr = '男'
+              } else {
+                this.detail.genderStr = '未知'
+              }
+              resolve(results.data)
+            } else {
+              reject(results.data)
+            }
+          })
+          .catch(err => {
+            reject(err)
+            this.$message.error('获取详情失败！')
+          })
+      })
+    },
     newPage(type, row) {
-      if (type === 'add') {
+      if (type === 'detail') {
         window.open(
-          `/#/customerManage/customerList/customerEdit/${row._id}/`,
-          '_blank'
-        )
-      } else if (type === 'physical') {
-        window.open(
-          `/#/customerManage/healthManage/physical/physicalList/${row._id}/`,
-          '_blank'
-        )
-      } else if (type === 'questionnaire') {
-        window.open(
-          `/#/customerManage/healthManage/questionnaire/questionnaireList/${
-            row._id
-          }/`,
+          `/#/customerManage/healthManage/physical/physicalDetail/${row._id}/`,
           '_blank'
         )
       }
@@ -217,35 +187,17 @@ export default {
       let postData = {
         page: this.pageData.currentPage,
         page_size: this.pageData.pageSize,
-        enterpriseId: this.enterpriseId
+        card_no: this.detail.identity_card
+        // enterpriseId: this.enterpriseId
       }
-      postData.search_type = this.searchPostData.field
-      postData.search = this.searchPostData.keyword
+      //   postData.search_type = this.searchPostData.field
+      //   postData.search = this.searchPostData.keyword
 
       postData = this.pbFunc.fifterObjIsNull(postData)
-      this.$$http('consumersList', postData)
+      this.$$http('physicalList', postData)
         .then(results => {
           if (results.data && results.data.code === 0) {
             this.tableData = results.data.content.instances
-            this.tableData.forEach(item => {
-              item.packageStr = ''
-              item.genderStr = ''
-              if (item.gender === '0') {
-                item.genderStr = '女'
-              } else if (item.gender === '1') {
-                item.genderStr = '男'
-              } else {
-                item.genderStr = '未知'
-              }
-              item.package_list.forEach((packages, index) => {
-                item.packageStr +=
-                  packages.package_name +
-                  '(' +
-                  packages.package_type +
-                  ')' +
-                  (index < item.package_list.length - 1 ? '，' : '')
-              })
-            })
             this.pageData.totalCount = results.data.content.count
           }
         })
@@ -259,9 +211,16 @@ export default {
     }
   },
   created() {
-    this.getList()
+    this.getDetail().then(data => {
+      if (data.code === 0) {
+        this.getList()
+      }
+    })
   }
 }
 </script>
-<style>
+<style scoped lang="less">
+.nav-tab .el-row {
+  padding: 0 !important;
+}
 </style>

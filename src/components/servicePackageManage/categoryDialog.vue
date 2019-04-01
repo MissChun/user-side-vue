@@ -17,6 +17,12 @@
           status-icon
           ref="categoryRules"
         >
+          <el-form-item label="项目类别：" prop="project_name" v-if="categoryDialog.type ==='add'">
+            <el-radio-group v-model="categoryRules.package_type">
+              <el-radio :label="'medical'">体检类</el-radio>
+              <el-radio :label="'management'">健康服务类</el-radio>
+            </el-radio-group>
+          </el-form-item>
           <el-form-item label="类别名称：" prop="project_name">
             <el-input
               :autofocus="true"
@@ -26,6 +32,10 @@
             ></el-input>
           </el-form-item>
         </el-form>
+        <div
+          class="text-center fs-12 text-red"
+          v-if="categoryDialog.type ==='update'"
+        >注意：编辑类别后，【套餐设置】及【用户界面】的类别描述会做相应改变</div>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="closeBtn">取 消</el-button>
@@ -58,7 +68,8 @@ export default {
     return {
       type: 'category', // 弹窗类型
       categoryRules: {
-        project_name: ''
+        project_name: '',
+        package_type: 'medical'
       },
       rules: {
         project_name: [
@@ -96,7 +107,8 @@ export default {
           let apiName = ''
           let postData = {
             project_level: 'first',
-            project_name: this.categoryRules.project_name
+            project_name: this.categoryRules.project_name,
+            package_type: this.categoryRules.package_type
           }
           if (this.categoryDialog.type === 'add') {
             apiName = 'addCategory'
@@ -149,10 +161,12 @@ export default {
       handler(val, oldVal) {
         if (val.isShow && val.type === 'update') {
           this.categoryRules.project_name = this.row.project_name
+          this.categoryRules.package_type = this.row.package_type
           this.title = '编辑类别'
         } else {
           this.title = '新增类别'
           this.categoryRules.project_name = ''
+          this.categoryRules.package_type = 'medical'
         }
         if (this.$refs['categoryRules']) {
           this.$refs['categoryRules'].clearValidate()

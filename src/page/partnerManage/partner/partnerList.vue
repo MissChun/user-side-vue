@@ -19,7 +19,7 @@
                     :value="item.id"
                   ></el-option>
                 </el-select>
-                <el-button slot="append" icon="el-icon-search"></el-button>
+                <el-button slot="append" icon="el-icon-search" @click="startSearch"></el-button>
               </el-input>
             </el-col>
           </el-row>
@@ -36,7 +36,7 @@
                     v-for="(item) in selectData.partnerTypeSelect"
                     :key="item._id"
                     :label="item.value"
-                    :value="item._id"
+                    :value="item.id"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -112,7 +112,7 @@ export default {
         field: 'enterprise_name'
       },
       selectData: {
-        partnerTypeSelect: [{ id: '', value: '全部' }],
+        partnerTypeSelect: [{ _id: '', id: '', value: '全部' }],
         fieldSelect: [
           { id: 'enterprise_name', value: '合作方名称' },
           { id: 'contact', value: '联系人' },

@@ -6,13 +6,9 @@
  */
 
 import axios from 'axios'
-import {
-  Message
-} from 'element-ui'
+import { Message } from 'element-ui'
 import api from './api'
-import {
-  getLocalData
-} from '../assets/js/cache'
+import { getLocalData } from '../assets/js/cache'
 import router from '../router'
 
 /* 接口超时时长设置 */
@@ -20,7 +16,7 @@ let timeout = 60000
 
 /* 配置访问url */
 let domainUrl = ''
-export const getDomainUrl = function (prefix = '') {
+export const getDomainUrl = function(prefix = '') {
   // 掐指一算五个环境
   let currentUrl = document.location.href.toString()
   let domainUrl = ''
@@ -31,11 +27,7 @@ export const getDomainUrl = function (prefix = '') {
   } else if (currentUrl.match('ptms.91lng.cn')) {
     // 预发环境
     domainUrl = `${prefix}ptms.91lng.cn`
-  } else if (
-    currentUrl.match(`tc.shengdujk.com`) &&
-    !currentUrl.match(`tc.shengdujk.com`) &&
-    !currentUrl.match(`tc.shengdujk.com`)
-  ) {
+  } else if (currentUrl.match(`tc.shengdujk.com`)) {
     // 测试环境
     domainUrl = `${prefix}api.shengdujk.com`
   } else if (
@@ -124,7 +116,7 @@ axios.interceptors.response.use(
 )
 
 /* 统一处理网络问题或者代码问题造成的错误 */
-const errorState = function (error) {
+const errorState = function(error) {
   let errorMsg = ''
   if (error && error.response) {
     switch (error.response.status) {
@@ -184,7 +176,7 @@ const errorState = function (error) {
 }
 
 /* 根据后端接口文档统一处理错误信息 */
-const successState = function (response) {
+const successState = function(response) {
   if (response.data && response.data.code) {
     if (response.data.code === 401) {
       Message.error('登录过期，请重新登录')
@@ -193,7 +185,8 @@ const successState = function (response) {
       })
     } else if (response.data.code === 403) {
       Message.error('无操作权限')
-    } else if (response.data.code === 0) {} else {
+    } else if (response.data.code === 0) {
+    } else {
       if (response.data.msg) {
         Message.error(response.data.msg)
       }
@@ -202,7 +195,7 @@ const successState = function (response) {
 }
 
 /* 处理url */
-const dealApiUrlParam = function (apiName, postData) {
+const dealApiUrlParam = function(apiName, postData) {
   let httpUrl = api[apiName].url
 
   if (httpUrl) {
@@ -224,7 +217,7 @@ const dealApiUrlParam = function (apiName, postData) {
 }
 
 /* 处理http请求config */
-const dealConfig = function (apiName, postData) {
+const dealConfig = function(apiName, postData) {
   const httpConfig = {
     method: '',
     baseURL: domainUrl,
@@ -242,16 +235,19 @@ const dealConfig = function (apiName, postData) {
   let token = getLocalData('token', true)
   httpConfig.method = method
 
+  /* eslint-disable */
   httpConfig.headers =
-    method === 'get' ? {
-      'X-Requested-With': 'XMLHttpRequest',
-      Accept: 'application/json',
-      'Content-Type': 'application/json; charset=UTF-8'
-    } : {
-      'X-Requested-With': 'XMLHttpRequest',
-      'Content-Type': 'application/json; charset=UTF-8'
-    }
-
+    method === 'get'
+      ? {
+          'X-Requested-With': 'XMLHttpRequest',
+          Accept: 'application/json',
+          'Content-Type': 'application/json; charset=UTF-8'
+        }
+      : {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json; charset=UTF-8'
+        }
+  /* eslint-enable */
   if (!api[apiName].notNeedToken) {
     httpConfig.headers.Authorization = token
   }
@@ -302,7 +298,7 @@ export const httpServer = (
 
   let httpConfig = dealConfig(apiName, postData)
 
-  let promise = new Promise(function (resolve, reject) {
+  let promise = new Promise(function(resolve, reject) {
     axios(httpConfig)
       .then(res => {
         // 默认使用successState

@@ -24,16 +24,18 @@
             </el-col>
           </el-row>
           <el-row :gutter="20">
-            <el-col :span="6">
-              <el-form-item label="是否异常:">
-                <el-select v-model="searchFilters.enterprise_type" placeholder="请选择">
-                  <el-option
-                    v-for="(item) in selectData.abnormalSelect"
-                    :key="item._id"
-                    :label="item.value"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
+            <el-col :span="8">
+              <el-form-item label="订单生成时间:" label-width="110px">
+                <el-date-picker
+                  v-model="screenTime"
+                  type="datetimerange"
+                  @change="startSearch"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  :default-time="['00:00:00', '23:59:59']"
+                ></el-date-picker>
               </el-form-item>
             </el-col>
           </el-row>
@@ -60,19 +62,7 @@
             align="center"
             :label="item.title"
             :width="item.width"
-          >
-            <template slot-scope="scope">
-              <div v-if="item.isShow">{{scope.row[item.param]}}</div>
-              <div v-else>
-                <span class="text-blue cursor-pointer" @click="newPage(item.type,scope.row)">查看</span>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" align="center" width="150" fixed="right">
-            <template slot-scope="scope">
-              <el-button type="primary" size="mini" @click="newPage('add',scope.row)">签约服务包</el-button>
-            </template>
-          </el-table-column>
+          ></el-table-column>
         </el-table>
         <noData v-if="!pageLoading && tableData.length==0"></noData>
       </div>
@@ -92,7 +82,7 @@
 </template>
 <script>
 export default {
-  name: 'healthManageList',
+  name: 'healthOutsourceList',
   computed: {
     enterpriseId() {
       let users = this.pbFunc.getLocalData('users', true)
@@ -111,73 +101,50 @@ export default {
       searchFilters: {
         enterprise_type: '',
         keyword: '',
-        field: 'nick_name'
+        field: 'enterprise_name'
       },
       selectData: {
-        abnormalSelect: [
-          { id: '', value: '全部' },
-          { id: '0', value: '是' },
-          { id: '1', value: '否' }
-        ],
-        fieldSelect: [
-          { id: 'nick_name', value: '姓名' },
-          { id: 'mobile_number', value: '电话' }
-        ]
+        fieldSelect: [{ id: 'enterprise_name', value: '合作方名称' }]
       },
       thTableList: [
         {
-          title: '姓名',
-          param: 'nick_name',
-          isShow: true,
+          title: '合作方名称',
+          param: 'enterprise_name',
           width: ''
         },
         {
-          title: '性别',
-          param: 'genderStr',
-          isShow: true,
+          title: '健康管理服务下单数',
+          param: 'total_count',
           width: ''
         },
         {
-          title: '年龄',
-          param: 'age',
-          isShow: true,
+          title: '待服务订单数',
+          param: 'actual_count',
           width: ''
         },
         {
-          title: '电话',
-          param: 'mobile_number',
-          isShow: true,
+          title: '服务中订单数',
+          param: 'actual_count',
           width: ''
         },
         {
-          title: '体检报告',
-          param: '',
-          type: 'physical',
+          title: '已完成订单数',
+          param: 'actual_count',
           width: ''
         },
         {
-          title: '随访问卷',
-          param: '',
-          type: 'questionnaire',
+          title: '应付金额',
+          param: 'should_pay',
           width: ''
         },
         {
-          title: '健康评估',
-          param: '',
-          width: ''
-        },
-        {
-          title: '健康干预方案',
-          param: '',
-          width: ''
-        },
-        {
-          title: '是否异常',
-          param: '',
+          title: '实付金额',
+          param: 'actual_pay',
           width: ''
         }
       ],
-      tableData: []
+      tableData: [],
+      screenTime: [] // 筛选项
     }
   },
   methods: {
@@ -192,60 +159,26 @@ export default {
       this.searchPostData = this.pbFunc.deepcopy(this.searchFilters)
       this.getList()
     },
-    newPage(type, row) {
-      if (type === 'add') {
-        window.open(
-          `/#/customerManage/customerList/customerEdit/${row._id}/`,
-          '_blank'
-        )
-      } else if (type === 'physical') {
-        window.open(
-          `/#/customerManage/healthManage/physical/physicalList/${row._id}/`,
-          '_blank'
-        )
-      } else if (type === 'questionnaire') {
-        window.open(
-          `/#/customerManage/healthManage/questionnaire/questionnaireList/${
-            row._id
-          }/`,
-          '_blank'
-        )
-      }
-    },
+    newPage(type, row) {},
     // 列表
     getList() {
       let postData = {
         page: this.pageData.currentPage,
         page_size: this.pageData.pageSize,
-        enterpriseId: this.enterpriseId
+        enterpriseId: this.enterpriseId,
+        order_type: 'business-order'
       }
       postData.search_type = this.searchPostData.field
       postData.search = this.searchPostData.keyword
-
+      if (this.screenTime && this.screenTime.length) {
+        postData.created_at_start = this.screenTime[0]
+        postData.created_at_end = this.screenTime[1]
+      }
       postData = this.pbFunc.fifterObjIsNull(postData)
-      this.$$http('consumersList', postData)
+      this.$$http('businessDataList', postData)
         .then(results => {
           if (results.data && results.data.code === 0) {
             this.tableData = results.data.content.instances
-            this.tableData.forEach(item => {
-              item.packageStr = ''
-              item.genderStr = ''
-              if (item.gender === '0') {
-                item.genderStr = '女'
-              } else if (item.gender === '1') {
-                item.genderStr = '男'
-              } else {
-                item.genderStr = '未知'
-              }
-              item.package_list.forEach((packages, index) => {
-                item.packageStr +=
-                  packages.package_name +
-                  '(' +
-                  packages.package_type +
-                  ')' +
-                  (index < item.package_list.length - 1 ? '，' : '')
-              })
-            })
             this.pageData.totalCount = results.data.content.count
           }
         })
