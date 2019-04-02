@@ -82,7 +82,7 @@ export default {
       rules: {
         project_name: [
           { required: true, message: '请输入小项名称', trigger: 'blur' },
-          { min: 1, max: 20, message: '小项名称字数为1~20字', trigger: 'blur' }
+          { min: 1, max: 50, message: '小项名称字数为1~50字', trigger: 'blur' }
           // { pattern: /^[\u4E00-\u9FA5A-Za-z0-9]{2,20}$/gi, message: '企业名称为中文、英文，不能输入数字、标点符号', trigger: 'blur' },
         ],
         project_description: [

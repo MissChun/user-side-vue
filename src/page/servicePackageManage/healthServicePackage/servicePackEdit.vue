@@ -439,12 +439,11 @@ export default {
           this.getDetail(this.editMsgForm.showProjects)
         }
       })
+    } else {
+      if (this.type === 'medical' || (this.type === 'management' && !this.id)) {
+        this.getCategoryList()
+      }
     }
-    // else {
-    //   if (this.type === 'medical' || (this.type === 'management' && !this.id)) {
-    //     this.getCategoryList()
-    //   }
-    // }
     this.getPartnersList()
   },
   methods: {
@@ -470,7 +469,6 @@ export default {
       } else {
         this.editMsgForm.showProjects = []
       }
-      console.log(query)
     },
     // 合作方
     getPartnersList() {
@@ -517,7 +515,7 @@ export default {
       }
     },
     // 详情
-    getDetail: function(showProjects) {
+    getDetail(showProjects) {
       this.$$http('servicePackDetail', { id: this.id }).then(results => {
         if (results.data && results.data.code === 0) {
           this.detail = results.data.content
@@ -704,7 +702,6 @@ export default {
                   //   this.$store.state.common.regular.frequency.match
                   // )
                 ) {
-                  console.log('number', project.number)
                   this.$message.error(
                     this.$store.state.common.regular.frequency.tips
                   )
@@ -745,7 +742,6 @@ export default {
                 })
               })
               resolve(results)
-              console.log('检查项', this.editMsgForm.showProjects)
             } else {
               reject(results)
             }

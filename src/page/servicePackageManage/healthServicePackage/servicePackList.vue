@@ -215,7 +215,8 @@ export default {
     deleteServicePack(row) {
       this.$msgbox({
         title: '删除服务包',
-        message: '删除提示内容',
+        message:
+          '请确认需要删除该服务包，删除后不可找回，该操作不影响已新建的订单',
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         showCancelButton: true,
