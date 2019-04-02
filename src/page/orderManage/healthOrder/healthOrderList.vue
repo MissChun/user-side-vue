@@ -99,10 +99,6 @@
                 @click="goAddLink('detail',scope.row)"
                 class="cursor-pointer text-blue"
               >{{scope.row[item.param]}}</div>
-              <div v-else-if="item.param==='source'">
-                {{scope.row[item.param]}}
-                <span v-if="scope.row[item.param]">端</span>
-              </div>
               <div v-else-if="item.param_two">{{scope.row[item.param][item.param_two]}}</div>
               <div v-else>{{scope.row[item.param]}}</div>
             </template>
@@ -217,7 +213,7 @@ export default {
         },
         {
           title: '健康管理订单来源',
-          param: 'source',
+          param: 'auto_source',
           width: ''
         },
         {
