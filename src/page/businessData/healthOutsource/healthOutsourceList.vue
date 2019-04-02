@@ -165,7 +165,7 @@ export default {
       let postData = {
         page: this.pageData.currentPage,
         page_size: this.pageData.pageSize,
-        enterpriseId: this.enterpriseId,
+        // enterpriseId: this.enterpriseId,
         order_type: 'business-order'
       }
       postData.search_type = this.searchPostData.field

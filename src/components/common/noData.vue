@@ -18,7 +18,7 @@ export default {
         styles: {
           position: 'absolute',
           top: '44px',
-          height: '440px',
+          height: '460px',
           backgroundColor: 'white',
           width: '100%',
           textAlign: 'center',

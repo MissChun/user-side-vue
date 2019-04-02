@@ -80,7 +80,7 @@
                         label="适用医院:"
                         :prop="'prices.' + index + '.partners'"
                         :rules="[
-                             { required: true, message: '请选择适用医院', trigger: 'change' },
+                             { required: true, message: '请选择适用医院', trigger: 'blur' },
                           ]"
                       >
                         <el-select
@@ -468,7 +468,6 @@ export default {
     },
     // 编辑结算价格
     updateSettlementPrice(row) {
-      console.log('row', row)
       this.$refs['addFormSetpOne'].validate(valid => {
         if (valid) {
           if (row.id) {

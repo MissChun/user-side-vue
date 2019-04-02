@@ -216,8 +216,8 @@ export default {
     getList() {
       let postData = {
         page: this.pageData.currentPage,
-        page_size: this.pageData.pageSize,
-        enterpriseId: this.enterpriseId
+        page_size: this.pageData.pageSize
+        // enterpriseId: this.enterpriseIds
       }
       postData.search_type = this.searchPostData.field
       postData.search = this.searchPostData.keyword
