@@ -26,7 +26,7 @@
           <el-row :gutter="20">
             <el-col :span="6">
               <el-form-item label="健康管理阶段:" label-width="100px">
-                <el-select v-model="searchFilters.operation" placeholder="请选择">
+                <el-select v-model="searchFilters.state" @change="startSearch" placeholder="请选择">
                   <el-option
                     v-for="(item,key) in selectData.stageSelect"
                     :key="key"
@@ -38,7 +38,7 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="订单状态:">
-                <el-select v-model="searchFilters.complete_status" placeholder="请选择">
+                <el-select v-model="searchFilters.status" @change="startSearch" placeholder="请选择">
                   <el-option
                     v-for="(item,key) in selectData.orderStatusSelect"
                     :key="key"
@@ -120,7 +120,7 @@
                 size="mini"
                 :plain="(item.statusNew==='canceled'?true:false)|| (index/2?true:false)"
                 v-for="(item,index) in statusBtn(scope.row.status,scope.row.source)"
-                @click="switchingState(scope.row)"
+                @click="switchingState(scope.row,item.statusNew)"
                 :key="index"
               >{{item.statusNew==='canceled'?'':'置为'}}{{item.value}}</el-button>
             </template>
@@ -260,10 +260,7 @@ export default {
           statusNew = 'waiting'
         }
       } else if (status === 'waiting') {
-        if (type === 'obligation') {
-          msg = '请确认已退回款项，操作后订单将置为【待付款】的状态!'
-          statusNew = 'obligation'
-        } else {
+        if (type === 'in_service') {
           msg = '操作后订单将置为【服务中】的状态!'
           statusNew = 'in_service'
         }
@@ -271,9 +268,6 @@ export default {
         if (type === 'finished') {
           msg = '请确认已结算完成，操作后订单将置为【已完成】的状态!'
           statusNew = 'finished'
-        } else if (type === 'waiting') {
-          msg = '操作后订单将置为【待服务】的状态!'
-          statusNew = 'waiting'
         } else {
           msg = '操作后订单将置为【待结算】的状态!'
           statusNew = 'settlement'
@@ -282,13 +276,7 @@ export default {
         if (type === 'finished') {
           msg = '请确认已结算完成，操作后订单将置为【已完成】的状态!'
           statusNew = 'finished'
-        } else if (type === 'waiting') {
-          msg = '操作后订单将置为【服务中】的状态!'
-          statusNew = 'waiting'
         }
-      } else if (status === 'finished') {
-        msg = '操作后订单将置为【待结算】的状态!'
-        statusNew = 'settlement'
       }
       this.$msgbox({
         title: '订单状态更改',
@@ -340,39 +328,24 @@ export default {
     statusBtn(status, source) {
       let btnList = []
       if (status === 'obligation') {
-        if (source === 'C') {
-          btnList = [
-            {
-              status: 'obligation',
-              statusNew: 'canceled',
-              value: '取消订单'
-            },
-            {
-              status: 'obligation',
-              statusNew: 'waiting',
-              value: '待服务'
-            }
-          ]
-        } else {
-          btnList = [
-            {
-              status: 'obligation',
-              statusNew: 'waiting',
-              value: '待服务'
-            }
-          ]
-        }
+        btnList = [
+          {
+            status: 'obligation',
+            statusNew: 'canceled',
+            value: '取消订单'
+          },
+          {
+            status: 'obligation',
+            statusNew: 'waiting',
+            value: '待服务'
+          }
+        ]
       } else if (status === 'waiting') {
         btnList = [
           {
             status: 'waiting',
             statusNew: 'in_service',
             value: '服务中'
-          },
-          {
-            status: 'waiting',
-            statusNew: 'obligation',
-            value: '待付款'
           }
         ]
       } else if (status === 'in_service') {
@@ -382,11 +355,6 @@ export default {
               status: 'in_service',
               statusNew: 'finished',
               value: '已完成'
-            },
-            {
-              status: 'in_service',
-              statusNew: 'waiting',
-              value: '待服务'
             }
           ]
         } else {
@@ -395,11 +363,6 @@ export default {
               status: 'in_service',
               statusNew: 'settlement',
               value: '待结算'
-            },
-            {
-              status: 'in_service',
-              statusNew: 'waiting',
-              value: '待服务'
             }
           ]
         }
@@ -409,19 +372,6 @@ export default {
             status: 'settlement',
             statusNew: 'finished',
             value: '已完成'
-          },
-          {
-            status: 'settlement',
-            statusNew: 'in_service',
-            value: '服务中'
-          }
-        ]
-      } else if (status === 'finished') {
-        btnList = [
-          {
-            status: 'finished',
-            statusNew: 'settlement',
-            value: '待结算'
           }
         ]
       }
@@ -488,7 +438,7 @@ export default {
       let postData = {
         page: this.pageData.currentPage,
         page_size: this.pageData.pageSize,
-        enterprise: this.enterpriseId,
+        // enterprise: this.enterpriseId,
         client_type: 'B',
         order_type: 'service-order',
         status: this.searchPostData.status,
@@ -496,7 +446,7 @@ export default {
       }
       postData.search_type = this.searchPostData.field
       postData.search = this.searchPostData.keyword
-      if (this.generationTime.length) {
+      if (this.generationTime && this.generationTime.length) {
         postData.created_at_start = this.generationTime[0]
         postData.created_at_end = this.generationTime[1]
       }

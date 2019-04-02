@@ -59,6 +59,9 @@
     border: 1px solid #dcdfe6;
   }
 }
+/deep/.table-list .el-table--mini th {
+  padding: 0 !important;
+}
 </style>
 <template>
   <div id="addPerson" class="detail-main">
@@ -136,7 +139,7 @@
                         size="mini"
                         v-loading="categoryLoading"
                         border
-                        :class="{'tabal-height-500':!editMsgForm.showProjects.length}"
+                        :class="{'tabal-height-500':editMsgForm.showProjects&&!editMsgForm.showProjects.length}"
                       >
                         <el-table-column
                           v-for="(item,key) in thTableList"
@@ -163,7 +166,9 @@
                           </template>
                         </el-table-column>
                       </el-table>
-                      <no-data v-if="!categoryLoading && !editMsgForm.showProjects.length"></no-data>
+                      <no-data
+                        v-if="!categoryLoading && editMsgForm.showProjects&&!editMsgForm.showProjects.length"
+                      ></no-data>
                     </div>
                   </el-form-item>
                 </el-col>
@@ -184,7 +189,7 @@
                         size="mini"
                         v-loading="categoryLoading"
                         border
-                        :class="{'tabal-height-500':!editMsgForm.showProjects.length}"
+                        :class="{'tabal-height-500':editMsgForm.showProjects&&!editMsgForm.showProjects.length}"
                       >
                         <el-table-column
                           v-for="(item,key) in thTableList"
@@ -224,7 +229,7 @@
                           </template>
                         </el-table-column>
                       </el-table>
-                      <no-data v-if="!categoryLoading && !editMsgForm.showProjects.length"></no-data>
+                      <no-data v-if="!categoryLoading &&  !editMsgForm.showProjects.length"></no-data>
                     </div>
                   </el-form-item>
                 </el-col>
@@ -350,7 +355,7 @@ export default {
         package_description: '',
         package_price: '',
         selectProjects: [],
-        showProjects: [{ number: '' }],
+        showProjects: [],
         projects: []
       },
       categoryList: [], // 检查项
@@ -429,12 +434,18 @@ export default {
   },
   created() {
     if (this.id) {
-      this.getDetail()
+      this.getCategoryList().then(results => {
+        if (results.data && results.data.code === 0) {
+          this.getDetail(this.editMsgForm.showProjects)
+        }
+      })
     }
+    // else {
+    //   if (this.type === 'medical' || (this.type === 'management' && !this.id)) {
+    //     this.getCategoryList()
+    //   }
+    // }
     this.getPartnersList()
-    if (this.type === 'medical' || this.type === 'management') {
-      this.getCategoryList()
-    }
   },
   methods: {
     returnToPage: function() {
@@ -451,9 +462,15 @@ export default {
       }
     },
     // 选择合作方
-    selectService() {
+    selectService(query) {
       this.editMsgForm.settlement_price = 0
       this.editMsgForm.selectProjects = []
+      if (query) {
+        this.getCategoryList(query)
+      } else {
+        this.editMsgForm.showProjects = []
+      }
+      console.log(query)
     },
     // 合作方
     getPartnersList() {
@@ -485,9 +502,11 @@ export default {
             this.editMsgForm.selectProjects.forEach(id => {
               ids = id.split(',')
               if (ids[1] === project._id) {
-                this.editMsgForm.settlement_price += parseFloat(
-                  project.project_price
-                )
+                project.related_info.forEach(related => {
+                  this.editMsgForm.settlement_price += parseFloat(
+                    related.settlement_price
+                  )
+                })
               }
             })
           })
@@ -498,7 +517,7 @@ export default {
       }
     },
     // 详情
-    getDetail: function() {
+    getDetail: function(showProjects) {
       this.$$http('servicePackDetail', { id: this.id }).then(results => {
         if (results.data && results.data.code === 0) {
           this.detail = results.data.content
@@ -514,14 +533,29 @@ export default {
             package_description: this.detail.package_description,
             package_price: this.detail.package_price,
             selectProjects: [],
+            showProjects: showProjects.length ? showProjects : [],
             projects: []
           }
-          // this.detail.projects.forEach(item => {
-          //   item.sub_projects.forEach(project => {
-          //     let projectStr = item.project_id+','+project.project_id
-          //     this.editMsgForm.selectProjects.push(projectStr)
-          //   })
-          // })
+          this.editMsgForm.showProjects.forEach(showItem => {
+            this.detail.projects.forEach(item => {
+              if (showItem._id === item.project_id) {
+                showItem.sub_projects.forEach(showProject => {
+                  item.sub_projects.forEach(project => {
+                    if (showProject._id === project.project_id) {
+                      let projectStr =
+                        item.project_id + ',' + project.project_id
+                      this.editMsgForm.selectProjects.push(projectStr)
+                      showProject.number = project.count
+                    }
+                  })
+                })
+              }
+            })
+          })
+          // console.log(
+          //   'this.editMsgForm.selectProjects',
+          //   this.editMsgForm.selectProjects
+          // )
         }
       })
     },
@@ -568,14 +602,17 @@ export default {
                       path: `/servicePackageManage/healthServicePackage/servicePackList`
                     })
                   }
+                  this.$message.success('提交成功！')
                   resolve(results.data.content)
                 } else {
                   reject(results.data.content)
+                  this.$message.error('提交失败！')
                 }
               })
               // eslint-disable-next-line
               .catch(err => {
                 btnObject = this.btnNew
+                this.$message.error('提交失败！')
                 reject(err)
               })
           }
@@ -596,6 +633,8 @@ export default {
         'effect_time_start',
         'effect_time_end'
       ]
+      this.editMsgForm.effect_time_start = this.editMsgForm.effectTime[0]
+      this.editMsgForm.effect_time_end = this.editMsgForm.effectTime[1]
       if (this.type !== 'outsource') {
         this.editMsgForm.projects = []
         keyArray.push('projects')
@@ -609,93 +648,115 @@ export default {
           })
         })
       }
+      let postData = this.pbFunc.fifterbyArr(this.editMsgForm, keyArray)
+      postData.settlement_price = postData.settlement_price
+        ? parseFloat(postData.settlement_price)
+        : 0
+      postData.package_price = parseFloat(postData.package_price)
       if (this.type === 'management') {
-        this.frequencyReg(this.editMsgForm.selectProjects)
         this.editMsgForm.service_agencies = this.enterpriseId
         this.editMsgForm.showProjects.forEach(item => {
           item.sub_projects.forEach(project => {
-            this.editMsgForm.projects.forEach(list => {
+            postData.projects.forEach(list => {
               if (project._id === list.second) {
                 list.count = parseInt(project.number)
               }
             })
           })
         })
-      }
-      // console.log('选择项', this.editMsgForm.showProjects)
-      this.editMsgForm.effect_time_start = this.editMsgForm.effectTime[0]
-      this.editMsgForm.effect_time_end = this.editMsgForm.effectTime[1]
-
-      let postData = this.pbFunc.fifterbyArr(this.editMsgForm, keyArray)
-      postData.settlement_price = postData.settlement_price
-        ? parseFloat(postData.settlement_price)
-        : 0
-      postData.package_price = parseFloat(postData.package_price)
-
-      // console.log('小项', this.editMsgForm.projects)
-      if (this.id) {
-        this.editAjax(postData, formName, btnObject, null, true)
+        this.frequencyReg(this.editMsgForm.selectProjects).then(data => {
+          if (data) {
+            if (this.id) {
+              this.editAjax(postData, formName, btnObject, null, true)
+            } else {
+              if (btnType === 'out') {
+                this.editAjax(postData, formName, btnObject, null, true)
+              }
+            }
+          }
+        })
       } else {
-        if (btnType === 'out') {
+        if (this.id) {
           this.editAjax(postData, formName, btnObject, null, true)
+        } else {
+          if (btnType === 'out') {
+            this.editAjax(postData, formName, btnObject, null, true)
+          }
         }
       }
     },
     // 次数验证
     frequencyReg(list) {
-      this.editMsgForm.showProjects.forEach(item => {
-        item.sub_projects.forEach(project => {
-          list.forEach(id => {
-            let ids = id.split(',')
-            if (project._id === ids[1]) {
-              if (!project.number) {
-                this.$message.error('请输入次数！')
-                return false
-              } else if (
-                project.number.match(
-                  this.$store.state.common.regular.frequency.match
-                )
-              ) {
-                this.$message.error(
-                  this.$store.state.common.regular.frequency.tips
-                )
-                return false
-              } else if (project.number > 999) {
-                this.$message.error(
-                  this.$store.state.common.regular.frequency.tips
-                )
-                return false
+      return new Promise((resolve, reject) => {
+        this.editMsgForm.showProjects.forEach(item => {
+          item.sub_projects.forEach(project => {
+            list.forEach(id => {
+              let ids = id.split(',')
+              if (project._id === ids[1]) {
+                if (!project.number) {
+                  this.$message.error('请输入次数！')
+                  resolve(false)
+                } else if (
+                  this.$store.state.common.regular.frequency.match.test(
+                    project.number
+                  )
+                  // project.number.match(
+                  //   this.$store.state.common.regular.frequency.match
+                  // )
+                ) {
+                  console.log('number', project.number)
+                  this.$message.error(
+                    this.$store.state.common.regular.frequency.tips
+                  )
+                  resolve(false)
+                } else if (project.number > 999) {
+                  this.$message.error(
+                    this.$store.state.common.regular.frequency.tips
+                  )
+                  resolve(false)
+                }
               }
-            }
+            })
           })
         })
+        resolve(true)
       })
     },
     // 获取类别列表
-    getCategoryList() {
-      let postData = {
-        enterprise: this.enterpriseId,
-        package_type: this.type
-      }
-      this.categoryLoading = true
-      this.$$http('getProjectList', postData)
-        .then(results => {
-          this.categoryLoading = false
-          if (results.data && results.data.code === 0) {
-            this.editMsgForm.showProjects = results.data.content
-            this.editMsgForm.showProjects.forEach(item => {
-              item.sub_projects.forEach(project => {
-                project.selectId = item._id + ',' + project._id
-                project.number = ''
+    getCategoryList(partnerId) {
+      return new Promise((resolve, reject) => {
+        let postData = {
+          enterprise: this.enterpriseId,
+          package_type: this.type
+        }
+        if (partnerId) {
+          postData.partner_id = partnerId
+        }
+        this.categoryLoading = true
+        this.$$http('getProjectList', postData)
+          .then(results => {
+            this.categoryLoading = false
+            if (results.data && results.data.code === 0) {
+              this.editMsgForm.showProjects = results.data.content
+              this.editMsgForm.showProjects.forEach(item => {
+                item.sub_projects.forEach(project => {
+                  project.selectId = item._id + ',' + project._id
+                  project.number = ''
+                })
               })
-            })
-            console.log('检查项', this.editMsgForm.showProjects)
-          }
-        })
-        // eslint-disable-next-line
-        .catch(err => {
-          this.$message.error('获取检查项列表失败！')
-        })
+              resolve(results)
+              console.log('检查项', this.editMsgForm.showProjects)
+            } else {
+              reject(results)
+            }
+          })
+          // eslint-disable-next-line
+          .catch(err => {
+            this.categoryLoading = false
+            reject(err)
+            this.$message.error('获取检查项列表失败！')
+          })
+      })
     }
   }
 }

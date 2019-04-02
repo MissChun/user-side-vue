@@ -56,7 +56,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="9">
-              <el-form-item label="订单同步时间:" label-width="110px">
+              <el-form-item label="订单送达时间:" label-width="110px">
                 <el-date-picker
                   v-model="syncTime"
                   type="datetimerange"
@@ -125,7 +125,7 @@
                   plain
                   @click="switchingState(scope.row,'canceled')"
                 >取消订单</el-button>
-                <el-button type="success" size="mini" @click="switchingState(scope.row)">置为已付款</el-button>
+                <!-- <el-button type="success" size="mini" @click="switchingState(scope.row)">置为已付款</el-button> -->
               </span>
               <el-button
                 type="success"
@@ -179,7 +179,7 @@ export default {
         pageSize: 10
       },
       generationTime: [], // 订单生成时间
-      syncTime: [], // 订单同步时间
+      syncTime: [], // 订单送达时间
       searchPostData: {}, // 搜索参数
       searchFilters: {
         status: '',
@@ -237,7 +237,7 @@ export default {
           width: '180'
         },
         {
-          title: '订单同步时间',
+          title: '订单送达时间',
           param: 'assigned_time',
           width: '180'
         },
@@ -290,10 +290,7 @@ export default {
           msg = '请确认已收到款项，操作后订单将置为【已付款】的状态!'
           statusNew = 'paid'
         }
-      } else if (status === 'paid') {
-        msg = '请确认已退回款项，操作后订单将置为【待付款】的状态!'
-        statusNew = 'obligation'
-      } else if (status === 'used' || status === 'finished') {
+      } else if (status === 'used') {
         msg = '操作后订单将置为【待结算】的状态!'
         statusNew = 'settlement'
       } else if (status === 'settlement') {
@@ -342,12 +339,12 @@ export default {
     // 状态文字
     statusWords(status) {
       switch (status) {
-        case 'paid':
-          return '待付款'
+        case 'obligation':
+          return '已付款待使用'
         case 'used':
           return '待结算'
-        case 'finished':
-          return '待结算'
+        // case 'finished':
+        //   return '待结算'
         case 'settlement':
           return '已完成'
       }
@@ -415,18 +412,18 @@ export default {
       let postData = {
         page: this.pageData.currentPage,
         page_size: this.pageData.pageSize,
-        enterprise: this.enterpriseId,
+        // enterprise: this.enterpriseId,
         client_type: 'B',
         order_type: 'business-order',
         status: this.searchPostData.status
       }
       postData.search_type = this.searchPostData.field
       postData.search = this.searchPostData.keyword
-      if (this.syncTime.length) {
+      if (this.syncTime && this.syncTime.length) {
         postData.assigned_time_start = this.syncTime[0]
         postData.assigned_time_end = this.syncTime[1]
       }
-      if (this.generationTime.length) {
+      if (this.generationTime && this.generationTime.length) {
         postData.created_at_start = this.generationTime[0]
         postData.created_at_end = this.generationTime[1]
       }
