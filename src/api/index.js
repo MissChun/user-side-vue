@@ -22,7 +22,7 @@ export const getDomainUrl = function(prefix = '') {
   let domainUrl = ''
 
   if (currentUrl.match(`tc.shengdujk.com`)) {
-    domainUrl = `${prefix}api.hhtdlng.com/tms`
+    domainUrl = `${prefix}api.shengdujk.com`
   } else {
     domainUrl = `${prefix}api.shengdujk.com` // 本地开发环境
   }
