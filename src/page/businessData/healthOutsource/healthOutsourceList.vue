@@ -133,12 +133,12 @@ export default {
           width: ''
         },
         {
-          title: '应付金额',
+          title: '应收金额',
           param: 'should_pay',
           width: ''
         },
         {
-          title: '实付金额',
+          title: '实收金额',
           param: 'actual_pay',
           width: ''
         }
@@ -166,7 +166,7 @@ export default {
         page: this.pageData.currentPage,
         page_size: this.pageData.pageSize,
         // enterpriseId: this.enterpriseId,
-        order_type: 'business-order'
+        order_type: 'service-order '
       }
       postData.search_type = this.searchPostData.field
       postData.search = this.searchPostData.keyword

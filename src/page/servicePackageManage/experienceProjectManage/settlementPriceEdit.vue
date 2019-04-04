@@ -256,35 +256,40 @@ export default {
             let postData = {
               sub_project: row.id
             }
-            this.$$http('deleteProjectPrice', postData).then(results => {
-              instance.confirmButtonLoading = false
-              instance.confirmButtonText = '确定'
-              if (results.data && results.data.code === 0) {
-                this.$message({
-                  type: 'success',
-                  message: '删除成功'
-                })
-                this.getDetail()
-                done()
-              } else {
-                done()
-                let setMeal = ''
-                results.data.data.forEach((item, index) => {
-                  setMeal += item.enterprise_name + '、'
-                })
-                this.$alert(
-                  '无法删除，当前价格有以下套餐正在使用，请配置后重新操作删除!' +
-                    '<div>' +
-                    setMeal +
-                    '</div>',
-                  '删除结算价',
-                  {
-                    confirmButtonText: '确定',
-                    dangerouslyUseHTMLString: true
-                  }
-                )
-              }
-            })
+            this.$$http('deleteProjectPrice', postData)
+              .then(results => {
+                instance.confirmButtonLoading = false
+                instance.confirmButtonText = '确定'
+                if (results.data && results.data.code === 0) {
+                  this.$message({
+                    type: 'success',
+                    message: '删除成功'
+                  })
+                  this.getDetail()
+                  done()
+                } else {
+                  done()
+                  let setMeal = ''
+                  results.data.data.forEach((item, index) => {
+                    setMeal += item.enterprise_name + '、'
+                  })
+                  this.$alert(
+                    '无法删除，当前价格有以下套餐正在使用，请配置后重新操作删除!' +
+                      '<div>' +
+                      setMeal +
+                      '</div>',
+                    '删除结算价',
+                    {
+                      confirmButtonText: '确定',
+                      dangerouslyUseHTMLString: true
+                    }
+                  )
+                }
+              })
+              .catch(err => {
+                instance.confirmButtonLoading = false
+                instance.confirmButtonText = '确定'
+              })
           } else {
             done()
             this.$message({

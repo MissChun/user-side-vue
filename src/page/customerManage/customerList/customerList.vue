@@ -66,14 +66,15 @@
             :label="item.title"
             :width="item.width"
           ></el-table-column>
-          <el-table-column label="已签约服务" align="center">
+          <el-table-column label="已购买服务" align="center">
             <template slot-scope="scope">
-              <div :title="scope.row.packageStr">{{scope.row.packageStr}}</div>
+              <!-- <div :title="scope.row.packageStr">{{scope.row.packageStr}}</div> -->
+              <div class="no-wrap" :title="scope.row.packageStr">{{scope.row.packageStr}}</div>
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" width="150" fixed="right">
             <template slot-scope="scope">
-              <el-button type="primary" size="mini" @click="newPage('add',scope.row)">签约服务包</el-button>
+              <el-button type="primary" size="mini" @click="newPage('add',scope.row)">购买服务包</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -174,7 +175,9 @@ export default {
     newPage(type, row) {
       if (type === 'add') {
         window.open(
-          `/#/customerManage/customerList/customerEdit/${row._id}/`,
+          `/#/customerManage/customerList/customerEdit/${row._id}/?user=${
+            row.user
+          }`,
           '_blank'
         )
       }

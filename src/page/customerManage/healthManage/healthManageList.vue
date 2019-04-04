@@ -70,7 +70,7 @@
           </el-table-column>
           <el-table-column label="操作" align="center" width="150" fixed="right">
             <template slot-scope="scope">
-              <el-button type="primary" size="mini" @click="newPage('add',scope.row)">签约服务包</el-button>
+              <el-button type="primary" size="mini" @click="newPage('add',scope.row)">购买服务包</el-button>
             </template>
           </el-table-column>
         </el-table>

@@ -9,7 +9,7 @@
 }
 </style>
 <template>
-  <div id="addPerson" class="detail-main">
+  <div class="detail-main">
     <el-container v-loading="pageLoading">
       <el-header>
         <el-row>
@@ -124,10 +124,13 @@ export default {
   name: 'physicalOrderEdit',
   computed: {
     titleType: function() {
-      return '签约服务包'
+      return '购买服务包'
     },
-    id: function() {
+    id() {
       return this.$route.params.id || ''
+    },
+    user() {
+      return this.$route.query.user || ''
     },
     enterpriseId() {
       let users = this.pbFunc.getLocalData('users', true)
@@ -198,7 +201,7 @@ export default {
         }
       })
     },
-    editAjax(postData, formName, btnObject, stepNum, isReview) {
+    editAjax(postData, formName, btnObject) {
       return new Promise((resolve, reject) => {
         let btnTextCopy = this.pbFunc.deepcopy(btnObject).btnText
         this.btnNew = {
@@ -206,7 +209,8 @@ export default {
           isDisabled: false,
           isLoading: false
         }
-        let apiName = 'addSigning'
+        //let apiName = 'addSigning'
+        let apiName = 'addOrder'
         this.$refs[formName].validate(valid => {
           if (valid) {
             /* 如果id存在则为编辑 */
@@ -222,10 +226,16 @@ export default {
                   results.data.code === 0 &&
                   results.data.content
                 ) {
-                  this.$message.success('签约服务包成功')
-                  this.$router.push({
-                    path: `/customerManage/customerList/customerList`
-                  })
+                  this.$message.success('购买服务包成功')
+                  if (postData.order_type === 'service-order') {
+                    this.$router.push({
+                      path: `/orderManage/healthOrder/healthOrderList`
+                    })
+                  } else {
+                    this.$router.push({
+                      path: `/orderManage/physicalOrder/physicalOrderList`
+                    })
+                  }
                   resolve(results.data.content)
                 } else {
                   reject(results.data.content)
@@ -277,9 +287,23 @@ export default {
     editBasics(btn, btnType) {
       let formName = 'addFormSetpOne'
       let btnObject = btn
-      let keyArray = ['user', 'package']
-      let postData = this.pbFunc.fifterbyArr(this.editMsgForm, keyArray)
-      this.editAjax(postData, formName, btnObject, null, true)
+      // let keyArray = ['user', 'package']
+      // let postData = this.pbFunc.fifterbyArr(this.editMsgForm, keyArray)
+
+      let postData = {
+        user: this.user,
+        service_package: this.editMsgForm.package
+      }
+      if (
+        this.editMsgForm.servicePackType === 'outsource' ||
+        this.editMsgForm.servicePackType === 'management'
+      ) {
+        postData.order_type = 'service-order'
+      } else {
+        postData.order_type = 'business-order'
+      }
+      console.log('postData', postData, this.editMsgForm.servicePackType)
+      this.editAjax(postData, formName, btnObject)
     },
     // 服务包类型筛选列表
     getServicePackTypeList() {

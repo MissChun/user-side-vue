@@ -358,6 +358,7 @@ export default {
           if (results.data && results.data.code === 0) {
             this.categoryList = results.data.content
             // if (this.categoryList.length) {
+
             if (this.belongTo) {
               this.categoryList.forEach((item, index) => {
                 if (item._id === this.belongTo) {
@@ -427,7 +428,7 @@ export default {
                   type: 'success',
                   message: '删除成功'
                 })
-                this.getCategoryList(true)
+                this.getCategoryList(false)
                 done()
               } else {
                 done()
