@@ -139,6 +139,11 @@ export default {
           title: '联系电话',
           param: 'contact_phone',
           width: ''
+        },
+        {
+          title: '地址',
+          param: 'position.address',
+          width: ''
         }
       ],
       tableData: []

@@ -50,7 +50,7 @@
                       <label>服务性别:</label>
                       <div
                         class="detail-form-item"
-                        v-html="pbFunc.dealNullData(detailData.service_sex&&detailData.service_sex.value)"
+                        v-html="pbFunc.dealNullData(detailData.service_sex && detailData.service_sex.value)"
                       ></div>
                     </div>
                   </el-col>
@@ -119,8 +119,9 @@
                               >
                                 {{projects.project_name}}
                                 <span
-                                  v-if="index<scope.row.sub_projects.length-1"
-                                >，</span>
+                                  v-if="projects.count"
+                                >({{projects.count}}次)</span>
+                                <span v-if="index<scope.row.sub_projects.length-1">，</span>
                               </span>
                             </div>
                             <div v-else>{{scope.row[item.param]}}</div>
@@ -181,6 +182,12 @@ export default {
           this.pageLoading = false
           if (results.data && results.data.code === 0) {
             this.detailData = results.data.content
+            if (
+              this.detailData.service_sex &&
+              this.detailData.service_sex.key === '2'
+            ) {
+              this.detailData.service_sex.value = '不限'
+            }
           }
         })
         // eslint-disable-next-line
