@@ -130,7 +130,7 @@ const api = {
     param: {}
   },
   deleteProjectPrice: {
-    url: '/api/v1/modify-price/:sub_project',
+    url: '/api/v1/modify-price',
     method: 'delete',
     desc: '删除检查项价格',
     param: {}

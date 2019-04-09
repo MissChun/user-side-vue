@@ -144,7 +144,7 @@ export default {
         {
           title: '身份证号',
           param: 'identity_card',
-          width: ''
+          width: '180'
         },
         {
           title: '年龄',
