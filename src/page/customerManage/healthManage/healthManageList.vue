@@ -1,3 +1,30 @@
+<style scoped lang="less">
+.op-btn {
+  width: 40px;
+  margin: 0 auto;
+  /deep/ .el-menu.el-menu--horizontal {
+    border: 0;
+    > .el-submenu {
+      float: none;
+      .el-submenu__title {
+        height: 30px;
+        line-height: 30px;
+        padding: 0;
+        &:hover {
+          background-color: transparent;
+        }
+      }
+      .el-submenu__icon-arrow {
+        margin-left: 0;
+        font-size: 18px;
+      }
+    }
+  }
+  /deep/ .el-menu {
+    background-color: transparent;
+  }
+}
+</style>
 <template>
   <div>
     <div class="nav-tab">
@@ -70,7 +97,19 @@
           </el-table-column>
           <el-table-column label="操作" align="center" width="150" fixed="right">
             <template slot-scope="scope">
-              <el-button type="primary" size="mini" @click="newPage('add',scope.row)">购买服务包</el-button>
+              <div class="op-btn">
+                <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal">
+                  <!-- @select="handleSelect" -->
+                  <el-submenu index="0">
+                    <template slot="title"></template>
+                    <el-menu-item
+                      v-for="(item,index) in operationBtn"
+                      :key="index"
+                      @click="newPage(item.value,scope.row)"
+                    >{{item.label}}</el-menu-item>
+                  </el-submenu>
+                </el-menu>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -102,6 +141,7 @@ export default {
   data() {
     return {
       pageLoading: false,
+      activeIndex: '0',
       pageData: {
         currentPage: 1,
         totalCount: '',
@@ -124,6 +164,28 @@ export default {
           { id: 'mobile_number', value: '电话' }
         ]
       },
+      operationBtn: [
+        {
+          label: '获取异常详情',
+          value: ''
+        },
+        {
+          label: '查看健康档案',
+          value: ''
+        },
+        {
+          label: '获取干预方案',
+          value: ''
+        },
+        {
+          label: '获取健康评估',
+          value: ''
+        },
+        {
+          label: '发放随访问卷',
+          value: ''
+        }
+      ],
       thTableList: [
         {
           title: '姓名',
@@ -263,5 +325,3 @@ export default {
   }
 }
 </script>
-<style>
-</style>

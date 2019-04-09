@@ -241,6 +241,7 @@ export default {
     handleClick() {},
     // 删除结算价格
     deletePrice(row) {
+      console.log('row', row)
       this.$msgbox({
         title: '删除结算价',
         message:
@@ -254,7 +255,8 @@ export default {
             instance.confirmButtonLoading = true
             instance.confirmButtonText = '提交中...'
             let postData = {
-              sub_project: row.id
+              sub_project: this.id,
+              instance_id: row.id
             }
             this.$$http('deleteProjectPrice', postData)
               .then(results => {
@@ -286,6 +288,7 @@ export default {
                   )
                 }
               })
+              // eslint-disable-next-line
               .catch(err => {
                 instance.confirmButtonLoading = false
                 instance.confirmButtonText = '确定'
@@ -366,6 +369,7 @@ export default {
       })
     },
     getDetail: function() {
+      this.editMsgForm.prices = []
       this.$$http('getProjectDetail', { id: this.id }).then(results => {
         if (results.data && results.data.code === 0) {
           this.title = results.data.content.project_name
